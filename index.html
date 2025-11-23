@@ -285,6 +285,7 @@
       touch-action: manipulation;
       text-align: center;
       line-height: 1;
+      box-sizing: border-box;
     }
     .round-btn:active {
       transform: translateY(1px) scale(0.97);
@@ -391,7 +392,7 @@
       color: #6ee7b7;
     }
 
-    /* keypad – ปุ่มวงกลมใหญ่ กดง่าย (ใหญ่กว่าปุ่มเมนูเล็กน้อย) */
+    /* keypad – ปุ่มวงกลมใหญ่ กดง่าย (ใช้ขนาดตายตัว ป้องกันยืดบน iPad) */
     .keypad {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -407,11 +408,13 @@
       color: #111827;
       box-shadow: 0 2px 4px rgba(15,23,42,0.15);
       touch-action: manipulation;
-      width: clamp(64px, 20vw, 84px);
-      height: clamp(64px, 20vw, 84px);
+      width: 4.2rem;
+      height: 4.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      line-height: 1;
+      box-sizing: border-box;
     }
     .keypad button:active {
       transform: translateY(1px) scale(0.98);
