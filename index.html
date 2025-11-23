@@ -259,12 +259,14 @@
       color: var(--text-sub-dark);
     }
 
+    /* ปุ่มกลมแถวบนสุด */
     .controls-row {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 8px;
+      margin-bottom: 10px;
     }
     .round-btn {
       width: 58px;
@@ -281,6 +283,8 @@
       box-shadow: 0 4px 10px rgba(15,23,42,0.25);
       transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s;
       touch-action: manipulation;
+      text-align: center;
+      line-height: 1;
     }
     .round-btn:active {
       transform: translateY(1px) scale(0.97);
@@ -357,7 +361,7 @@
       color: var(--text-sub-dark);
     }
 
-    /* ช่องคำตอบ – ทำให้ใหญ่ ชัดเจน */
+    /* ช่องคำตอบ – ใหญ่ ชัดเจน */
     #answerInput {
       width: 100%;
       padding: 10px 12px;
@@ -395,7 +399,6 @@
       margin-top: 8px;
     }
     .keypad button {
-      padding: 0;
       border-radius: 50%;
       border: none;
       font-size: 1.2rem;
@@ -403,8 +406,10 @@
       background: #e5e7eb;
       color: #111827;
       box-shadow: 0 2px 4px rgba(15,23,42,0.15);
-      height: 56px;
-      touch-action: manipulation; /* ลดปัญหา double-tap zoom */
+      touch-action: manipulation;
+      aspect-ratio: 1 / 1;   /* ทำให้เป็นวงกลมเสมอ */
+      width: 100%;
+      height: auto;
     }
     .keypad button:active {
       transform: translateY(1px) scale(0.98);
@@ -419,6 +424,7 @@
       grid-column: span 3;
       border-radius: 999px;
       height: 54px;
+      aspect-ratio: auto;
       background: var(--accent-strong);
       color: #fff;
     }
@@ -512,6 +518,15 @@
 <div class="box" id="appBox">
   <h2>ครูเอฟ จินตคณิต</h2>
   <div class="subtitle">แอปฝึกคิดเลขเร็วแบบเกม จินตคณิต</div>
+
+  <!-- CONTROLS moved to top -->
+  <div class="controls-row">
+    <button id="settingsToggle"  class="round-btn">ตั้งค่า</button>
+    <button id="startBtn"       class="round-btn">เริ่ม</button>
+    <button id="stopBtn"        class="round-btn">หยุด</button>
+    <button id="resetBtn"       class="round-btn">รีเซ็ต</button>
+    <button id="fullscreenBtn"  class="round-btn">เต็มจอ</button>
+  </div>
 
   <!-- SETTINGS -->
   <div id="settingsWrapper" class="settings-wrapper">
@@ -674,15 +689,6 @@
       <tbody id="leaderboardBody"></tbody>
     </table>
   </div>
-
-  <!-- CONTROLS -->
-  <div class="controls-row">
-    <button id="settingsToggle"  class="round-btn">ตั้งค่า</button>
-    <button id="startBtn"       class="round-btn">เริ่ม</button>
-    <button id="stopBtn"        class="round-btn">หยุด</button>
-    <button id="resetBtn"       class="round-btn">รีเซ็ต</button>
-    <button id="fullscreenBtn"  class="round-btn">เต็มจอ</button>
-  </div>
 </div>
 
 <script>
@@ -706,7 +712,6 @@
   let questionNumber = 0;
   let maxQuestions = 1;
 
-  // Challenge mode
   const CHALLENGE_TARGET = 10;
   let challengeCorrectCount = 0;
   let challengeMistakes = 0;
@@ -714,7 +719,6 @@
   let challengeEndTime = null;
   let challengeTimerInterval = null;
 
-  // DOM
   const display = document.getElementById("numberDisplay");
   const digitSelect = document.getElementById("digitSelect");
   const countInput = document.getElementById("countInput");
