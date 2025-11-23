@@ -694,8 +694,838 @@
 </div>
 
 <script>
-/* โค้ด JavaScript เหมือนเวอร์ชันก่อนหน้านี้ทุกประการ
-   (ไม่มีการแก้ส่วน logic เพิ่มเติม) */
+(function(){
+  "use strict";
+
+  const SETTINGS_KEY = "kruF_jintakanit_settings_v3";
+  const LEADERBOARD_KEY = "kruF_challenge_scores_v1";
+
+  let sequence = [];
+  let totalAnswer = 0;
+  let index = 0;
+  let showTimer = null;
+  let running = false;
+
+  let competitionTimer = null;
+  let remainingTime = 0;
+
+  let audioCtx = null;
+
+  let questionNumber = 0;
+  let maxQuestions = 1;
+
+  const CHALLENGE_TARGET = 10;
+  let challengeCorrectCount = 0;
+  let challengeMistakes = 0;
+  let challengeStartTime = null;
+  let challengeEndTime = null;
+  let challengeTimerInterval = null;
+
+  const display = document.getElementById("numberDisplay");
+  const digitSelect = document.getElementById("digitSelect");
+  const countInput = document.getElementById("countInput");
+  const questionCountInput = document.getElementById("questionCountInput");
+  const speedInput = document.getElementById("speedInput");
+  const signModeSelect = document.getElementById("signModeSelect");
+  const competitionCheck = document.getElementById("competitionCheck");
+  const competitionSecondsInput = document.getElementById("competitionSeconds");
+  const timerDisplay = document.getElementById("timerDisplay");
+  const voiceCheck = document.getElementById("voiceCheck");
+  const voiceLangSelect = document.getElementById("voiceLangSelect");
+
+  const settingsToggle = document.getElementById("settingsToggle");
+  const settingsWrapper = document.getElementById("settingsWrapper");
+  const fullscreenBtn = document.getElementById("fullscreenBtn");
+  const darkModeToggle = document.getElementById("darkModeToggle");
+
+  const sizeRadios  = document.querySelectorAll('input[name="sizeOption"]');
+  const themeRadios = document.querySelectorAll('input[name="themeOption"]');
+  const animRadios  = document.querySelectorAll('input[name="animOption"]');
+  const modeRadios  = document.querySelectorAll('input[name="modeOption"]');
+
+  const challengePanel   = document.getElementById("challengePanel");
+  const challengeStatus  = document.getElementById("challengeStatus");
+  const answerInput      = document.getElementById("answerInput");
+  const answerFeedback   = document.getElementById("answerFeedback");
+  const summaryBox       = document.getElementById("summaryBox");
+  const scoreForm        = document.getElementById("scoreForm");
+  const playerNameInput  = document.getElementById("playerNameInput");
+  const saveScoreBtn     = document.getElementById("saveScoreBtn");
+  const leaderboardBody  = document.getElementById("leaderboardBody");
+
+  function isChallengeMode(){
+    const sel = document.querySelector('input[name="modeOption"]:checked');
+    return sel && sel.value === "challenge";
+  }
+
+  function applyTheme(themeVal) {
+    document.body.classList.remove("theme-blue","theme-orange","theme-purple","theme-green");
+    if (themeVal === "blue")      document.body.classList.add("theme-blue");
+    else if (themeVal === "purple") document.body.classList.add("theme-purple");
+    else if (themeVal === "green")  document.body.classList.add("theme-green");
+    else                            document.body.classList.add("theme-orange");
+  }
+
+  function applyDarkModeClass() {
+    if (darkModeToggle.checked) document.body.classList.add("dark-mode");
+    else document.body.classList.remove("dark-mode");
+  }
+
+  function applyNumberSize() {
+    const selected = document.querySelector('input[name="sizeOption"]:checked');
+    const val = selected ? selected.value : "medium";
+    let sizeRem = 3.2;
+    if      (val === "small") sizeRem = 2.4;
+    else if (val === "medium")sizeRem = 3.2;
+    else if (val === "large") sizeRem = 4.0;
+    else if (val === "xl")    sizeRem = 5.0;
+    else if (val === "xxl")   sizeRem = 6.0;
+    display.style.fontSize = sizeRem + "rem";
+  }
+
+  function getSelectedAnimationClass() {
+    const sel = document.querySelector('input[name="animOption"]:checked');
+    const val = sel ? sel.value : "pop";
+    if (val === "fade")  return "anim-fade";
+    if (val === "slide") return "anim-slide";
+    if (val === "flash") return "anim-flash";
+    return "anim-pop";
+  }
+
+  function animateDisplayOnce() {
+    const cls = getSelectedAnimationClass();
+    display.classList.remove("anim-pop","anim-fade","anim-slide","anim-flash");
+    void display.offsetWidth;
+    display.classList.add(cls);
+  }
+
+  function updateModeUI() {
+    if (isChallengeMode()) {
+      challengePanel.style.display = "block";
+    } else {
+      challengePanel.style.display = "none";
+    }
+  }
+
+  function initAudio() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+  }
+
+  function playBeep(freq = 800, duration = 0.12) {
+    try {
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration + 0.02);
+    } catch(e) {}
+  }
+
+  function playAnswerFx() {
+    playBeep(900, 0.12);
+    setTimeout(() => playBeep(1200, 0.12), 130);
+  }
+
+  function clampMs(v) {
+    if (isNaN(v)) v = 800;
+    return Math.max(1, Math.min(5000, v));
+  }
+
+  function getSpeechRate() {
+    const showMs = clampMs(parseInt(speedInput.value));
+    let rate = 1000 / showMs;
+    return Math.min(2.0, Math.max(0.5, rate));
+  }
+
+  function speakText(text, langOverride) {
+    if (!voiceCheck.checked) return;
+    if (!("speechSynthesis" in window)) return;
+
+    const lang = langOverride || (voiceLangSelect.value || "en-US");
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = lang;
+    utter.rate = getSpeechRate();
+    window.speechSynthesis.speak(utter);
+  }
+
+  function speakNumber(n) {
+    const lang = voiceLangSelect.value || "en-US";
+    const absStr = Math.abs(n).toString();
+    let text;
+    if (n < 0) {
+      if (lang.startsWith("th"))      text = "ลบ " + absStr;
+      else if (lang.startsWith("ja")) text = "マイナス " + absStr;
+      else                            text = "minus " + absStr;
+    } else {
+      text = absStr;
+    }
+    speakText(text, lang);
+  }
+
+  function speakQuestionNumber(q) {
+    const lang = voiceLangSelect.value || "en-US";
+    let text;
+    if (lang.startsWith("th"))      text = "ข้อที่ " + q;
+    else if (lang.startsWith("ja")) text = "だい " + q + " もん";
+    else                            text = "Question " + q;
+    speakText(text, lang);
+  }
+
+  function speakAnswer(ans) {
+    const lang = voiceLangSelect.value || "en-US";
+    const absStr = Math.abs(ans).toString();
+    let numText;
+    if (ans < 0) {
+      if (lang.startsWith("th"))      numText = "ลบ " + absStr;
+      else if (lang.startsWith("ja")) numText = "マイナス " + absStr;
+      else                            numText = "minus " + absStr;
+    } else {
+      numText = absStr;
+    }
+    let full;
+    if (lang.startsWith("th"))      full = "คำตอบ " + numText;
+    else if (lang.startsWith("ja")) full = "こたえ " + numText;
+    else                            full = "Answer " + numText;
+    speakText(full, lang);
+  }
+
+  function saveSettings() {
+    try {
+      const sizeSel  = document.querySelector('input[name="sizeOption"]:checked');
+      const themeSel = document.querySelector('input[name="themeOption"]:checked');
+      const animSel  = document.querySelector('input[name="animOption"]:checked');
+      const modeSel  = document.querySelector('input[name="modeOption"]:checked');
+
+      const data = {
+        digits: digitSelect.value,
+        countPerQuestion: countInput.value,
+        questionCount: questionCountInput.value,
+        speed: speedInput.value,
+        signMode: signModeSelect.value,
+        competitionEnabled: competitionCheck.checked,
+        competitionSeconds: competitionSecondsInput.value,
+        voiceEnabled: voiceCheck.checked,
+        voiceLang: voiceLangSelect.value,
+        numberSize: sizeSel ? sizeSel.value : "medium",
+        theme: themeSel ? themeSel.value : "orange",
+        animation: animSel ? animSel.value : "pop",
+        darkMode: darkModeToggle.checked,
+        mode: modeSel ? modeSel.value : "practice"
+      };
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      if (!raw) {
+        applyTheme("orange");
+        applyDarkModeClass();
+        applyNumberSize();
+        updateModeUI();
+        return;
+      }
+      const data = JSON.parse(raw);
+
+      if (data.digits) digitSelect.value = data.digits;
+      if (data.countPerQuestion) countInput.value = data.countPerQuestion;
+      if (data.questionCount) questionCountInput.value = data.questionCount;
+      if (data.speed) speedInput.value = data.speed;
+      if (data.signMode) signModeSelect.value = data.signMode;
+      if (typeof data.competitionEnabled === "boolean") competitionCheck.checked = data.competitionEnabled;
+      if (data.competitionSeconds) competitionSecondsInput.value = data.competitionSeconds;
+      if (typeof data.voiceEnabled === "boolean") voiceCheck.checked = data.voiceEnabled;
+      if (data.voiceLang) voiceLangSelect.value = data.voiceLang;
+
+      if (data.numberSize) {
+        const r = document.querySelector('input[name="sizeOption"][value="' + data.numberSize + '"]');
+        if (r) r.checked = true;
+      }
+      if (data.theme) {
+        const r = document.querySelector('input[name="themeOption"][value="' + data.theme + '"]');
+        if (r) r.checked = true;
+        applyTheme(data.theme);
+      } else {
+        applyTheme("orange");
+      }
+      if (data.animation) {
+        const r = document.querySelector('input[name="animOption"][value="' + data.animation + '"]');
+        if (r) r.checked = true;
+      }
+      if (typeof data.darkMode === "boolean") {
+        darkModeToggle.checked = data.darkMode;
+      }
+      if (data.mode) {
+        const r = document.querySelector('input[name="modeOption"][value="' + data.mode + '"]');
+        if (r) r.checked = true;
+      }
+
+      applyDarkModeClass();
+      applyNumberSize();
+      updateModeUI();
+    } catch(e) {
+      applyTheme("orange");
+      applyDarkModeClass();
+      applyNumberSize();
+      updateModeUI();
+    }
+  }
+
+  function attachSettingChangeListeners() {
+    const elems = [
+      digitSelect, countInput, questionCountInput, speedInput,
+      signModeSelect, competitionCheck, competitionSecondsInput,
+      voiceCheck, voiceLangSelect, darkModeToggle
+    ];
+    elems.forEach(el => {
+      if (!el) return;
+      el.addEventListener("change", saveSettings);
+      el.addEventListener("input",  saveSettings);
+    });
+
+    sizeRadios.forEach(r => r.addEventListener("change", () => {
+      applyNumberSize(); saveSettings();
+    }));
+    themeRadios.forEach(r => r.addEventListener("change", () => {
+      applyTheme(r.value); saveSettings();
+    }));
+    animRadios.forEach(r => r.addEventListener("change", saveSettings));
+    modeRadios.forEach(r => r.addEventListener("change", () => {
+      updateModeUI();
+      saveSettings();
+    }));
+  }
+
+  function toggleFullscreen() {
+    const isPseudo = document.body.classList.contains("pseudo-fullscreen");
+    if (!isPseudo) {
+      document.body.classList.add("pseudo-fullscreen");
+      fullscreenBtn.textContent = "ออก";
+      const elem = document.documentElement;
+      try {
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      } catch(e) {}
+    } else {
+      document.body.classList.remove("pseudo-fullscreen");
+      fullscreenBtn.textContent = "เต็มจอ";
+      try {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } catch(e) {}
+    }
+  }
+  fullscreenBtn.addEventListener("click", toggleFullscreen);
+
+  function startCompetitionIfNeeded() {
+    if (competitionTimer) {
+      clearInterval(competitionTimer);
+      competitionTimer = null;
+    }
+    timerDisplay.textContent = "";
+
+    if (!competitionCheck.checked) return;
+    if (isChallengeMode()) return;
+
+    let sec = parseInt(competitionSecondsInput.value);
+    if (isNaN(sec)) sec = 60;
+    sec = Math.max(5, Math.min(600, sec));
+
+    remainingTime = sec;
+    timerDisplay.textContent = "เวลา: " + remainingTime + " วินาที";
+
+    competitionTimer = setInterval(() => {
+      remainingTime--;
+      if (remainingTime <= 0) {
+        clearInterval(competitionTimer);
+        competitionTimer = null;
+        timerDisplay.textContent = "หมดเวลา!";
+        running = false;
+      } else {
+        timerDisplay.textContent = "เวลา: " + remainingTime + " วินาที";
+      }
+    }, 1000);
+  }
+
+  function generateSequence() {
+    sequence = [];
+    totalAnswer = 0;
+    index = 0;
+
+    const digits = parseInt(digitSelect.value) || 1;
+    let count = parseInt(countInput.value);
+    if (isNaN(count)) count = 5;
+    count = Math.max(1, Math.min(99, count));
+
+    const signMode = signModeSelect.value;
+    let runningSum = 0;
+
+    for (let i = 0; i < count; i++) {
+      let n;
+      while (true) {
+        const maxAbs = Math.pow(10, digits) - 1;
+        const minAbs = (digits === 1) ? 1 : Math.pow(10, digits - 1);
+        const abs = Math.floor(Math.random() * (maxAbs - minAbs + 1)) + minAbs;
+
+        let sign = 1;
+        if (signMode === "addsub") sign = Math.random() < 0.5 ? -1 : 1;
+        if (signMode === "add") sign = 1;
+
+        n = abs * sign;
+        if (runningSum + n >= 0) break;
+      }
+      sequence.push(n);
+      runningSum += n;
+    }
+
+    totalAnswer = runningSum;
+  }
+
+  function startChallengeTimerIfNeeded() {
+    if (!isChallengeMode()) return;
+    if (challengeStartTime !== null) return;
+    challengeStartTime = performance.now();
+    timerDisplay.textContent = "เวลา: 0.00 วินาที";
+    if (challengeTimerInterval) clearInterval(challengeTimerInterval);
+    challengeTimerInterval = setInterval(() => {
+      if (!running || !isChallengeMode() || challengeStartTime === null) return;
+      const now = performance.now();
+      const sec = (now - challengeStartTime) / 1000;
+      timerDisplay.textContent = "เวลา: " + sec.toFixed(2) + " วินาที";
+    }, 100);
+  }
+
+  function showSequence() {
+    if (!running) return;
+
+    if (index < sequence.length) {
+      if (isChallengeMode() && questionNumber === 1 && index === 0) {
+        startChallengeTimerIfNeeded();
+      }
+
+      const n = sequence[index];
+      display.textContent = n.toString();
+      animateDisplayOnce();
+
+      const freq = n >= 0 ? 1000 : 500;
+      playBeep(freq, 0.1);
+      speakNumber(n);
+
+      index++;
+
+      const showMs  = clampMs(parseInt(speedInput.value));
+      const blankMs = Math.min(200, Math.floor(showMs / 3));
+
+      showTimer = setTimeout(() => {
+        if (!running) return;
+        display.textContent = "";
+        display.classList.remove("anim-pop","anim-fade","anim-slide","anim-flash");
+        showTimer = setTimeout(showSequence, blankMs);
+      }, showMs);
+    } else {
+      if (isChallengeMode()) {
+        enterChallengeAnswerPhase();
+      } else {
+        startAnswerPromptPhase();
+      }
+    }
+  }
+
+  function runCountdownThenStart() {
+    const steps = ["พร้อม!!", "เริ่ม!!"];
+    let idx = 0;
+
+    function nextStep() {
+      if (!running) return;
+      const txt = steps[idx];
+      display.textContent = txt;
+      animateDisplayOnce();
+      speakText(txt);
+
+      if (txt === "พร้อม!!") playBeep(750, 0.16);
+      else if (txt === "เริ่ม!!") playBeep(1100, 0.18);
+
+      idx++;
+      if (idx < steps.length) {
+        showTimer = setTimeout(nextStep, 700);
+      } else {
+        showTimer = setTimeout(() => {
+          if (!running) return;
+          if (isChallengeMode()) startNewChallengeQuestion();
+          else startNewPracticeQuestion();
+        }, 1000);
+      }
+    }
+    nextStep();
+  }
+
+  function startNewPracticeQuestion() {
+    if (!running) return;
+    generateSequence();
+    display.textContent = "ข้อที่ " + questionNumber;
+    animateDisplayOnce();
+    speakQuestionNumber(questionNumber);
+
+    const headerMs = 1000;
+    showTimer = setTimeout(() => {
+      if (!running) return;
+      index = 0;
+      showSequence();
+    }, headerMs);
+  }
+
+  function startNewChallengeQuestion() {
+    if (!running) return;
+    generateSequence();
+    updateChallengeStatus();
+    display.textContent = "ข้อที่ " + questionNumber;
+    animateDisplayOnce();
+    speakQuestionNumber(questionNumber);
+
+    const headerMs = 1000;
+    showTimer = setTimeout(() => {
+      if (!running) return;
+      index = 0;
+      showSequence();
+    }, headerMs);
+  }
+
+  function startAnswerPromptPhase() {
+    if (!running) return;
+    let blinkCount = 0;
+    const totalBlinks = 6;
+    const blinkInterval = 500;
+
+    function blink() {
+      if (!running) return;
+      const showText = (blinkCount % 2 === 0);
+      display.textContent = showText ? "ตอบ" : "";
+      if (showText) playBeep(950, 0.08);
+
+      blinkCount++;
+      if (blinkCount < totalBlinks) {
+        showTimer = setTimeout(blink, blinkInterval);
+      } else {
+        showTimer = setTimeout(() => {
+          if (!running) return;
+          showAnswerThenNext();
+        }, 1000);
+      }
+    }
+    blink();
+  }
+
+  function showAnswerThenNext() {
+    if (!running) return;
+    display.textContent = totalAnswer.toString();
+    animateDisplayOnce();
+    playAnswerFx();
+    speakAnswer(totalAnswer);
+
+    const delayNextQuestion = 2000;
+    showTimer = setTimeout(() => {
+      if (!running) return;
+      questionNumber++;
+      if (questionNumber > maxQuestions) {
+        running = false;
+        display.textContent = "ครบ " + maxQuestions + " ข้อแล้ว";
+        animateDisplayOnce();
+      } else {
+        startNewPracticeQuestion();
+      }
+    }, delayNextQuestion);
+  }
+
+  function updateChallengeStatus() {
+    challengeStatus.textContent = "ข้อที่ " + questionNumber + " / " + CHALLENGE_TARGET +
+                                  " | ผิด: " + challengeMistakes + " ครั้ง";
+  }
+
+  function enterChallengeAnswerPhase() {
+    if (!running) return;
+    display.textContent = "";
+    updateChallengeStatus();
+    answerInput.value = "";
+    answerFeedback.textContent = "พิมพ์คำตอบแล้วกด ENTER";
+    if (answerInput.focus) answerInput.focus();
+  }
+
+  function finishChallenge() {
+    running = false;
+    if (showTimer) {
+      clearTimeout(showTimer);
+      showTimer = null;
+    }
+    if (challengeTimerInterval) {
+      clearInterval(challengeTimerInterval);
+      challengeTimerInterval = null;
+    }
+    if (challengeStartTime !== null) {
+      challengeEndTime = performance.now();
+      const totalSec = (challengeEndTime - challengeStartTime) / 1000;
+      const avgSec = totalSec / CHALLENGE_TARGET;
+      timerDisplay.textContent = "เวลา: " + totalSec.toFixed(2) + " วินาที";
+      display.textContent = "จบโหมดท้าทาย!";
+      animateDisplayOnce();
+      summaryBox.innerHTML =
+        "ใช้เวลา: " + totalSec.toFixed(2) + " วินาที<br>" +
+        "เฉลี่ย: " + avgSec.toFixed(2) + " วินาทีต่อข้อ<br>" +
+        "ตอบผิด: " + challengeMistakes + " ครั้ง";
+      scoreForm.style.display = "block";
+      answerFeedback.textContent = "";
+      answerInput.value = "";
+    }
+  }
+
+  function appendDigit(d) {
+    if (!isChallengeMode()) return;
+    if (!running) return;
+    answerInput.value += d;
+  }
+
+  function doBackspace() {
+    if (!isChallengeMode()) return;
+    if (!running) return;
+    answerInput.value = answerInput.value.slice(0, -1);
+  }
+
+  function doClearInput() {
+    if (!isChallengeMode()) return;
+    if (!running) return;
+    answerInput.value = "";
+  }
+
+  function submitChallengeAnswer() {
+    if (!isChallengeMode()) return;
+    if (!running) return;
+
+    const val = answerInput.value.trim();
+    if (!val) {
+      answerFeedback.textContent = "โปรดกรอกคำตอบ";
+      return;
+    }
+    const userAns = parseInt(val, 10);
+    if (isNaN(userAns)) {
+      answerFeedback.textContent = "โปรดกรอกตัวเลขที่ถูกต้อง";
+      return;
+    }
+
+    if (userAns === totalAnswer) {
+      answerFeedback.textContent = "ถูกต้อง! ไปข้อถัดไป";
+      playAnswerFx();
+      challengeCorrectCount++;
+      if (challengeCorrectCount >= CHALLENGE_TARGET) {
+        setTimeout(finishChallenge, 400);
+      } else {
+        questionNumber++;
+        answerInput.value = "";
+        setTimeout(() => {
+          if (!running) return;
+          startNewChallengeQuestion();
+        }, 600);
+      }
+    } else {
+      challengeMistakes++;
+      playBeep(400, 0.12);
+      answerFeedback.textContent = "ยังไม่ถูก ลองอีกครั้ง";
+      answerInput.value = "";
+      setTimeout(() => {
+        if (!running) return;
+        startNewChallengeQuestion();
+      }, 600);
+    }
+  }
+
+  document.querySelectorAll(".key-digit").forEach(btn => {
+    btn.addEventListener("click", () => {
+      appendDigit(btn.getAttribute("data-key"));
+    });
+  });
+  const backspaceBtn = document.querySelector(".key-backspace");
+  const clearBtn     = document.querySelector(".key-clear");
+  const enterBtn     = document.querySelector(".key-enter");
+
+  if (backspaceBtn) backspaceBtn.addEventListener("click", doBackspace);
+  if (clearBtn)     clearBtn.addEventListener("click", doClearInput);
+  if (enterBtn)     enterBtn.addEventListener("click", submitChallengeAnswer);
+
+  answerInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submitChallengeAnswer();
+    }
+  });
+
+  function loadLeaderboard() {
+    try {
+      const raw = localStorage.getItem(LEADERBOARD_KEY);
+      if (!raw) return [];
+      const data = JSON.parse(raw);
+      if (!Array.isArray(data)) return [];
+      return data;
+    } catch(e) {
+      return [];
+    }
+  }
+
+  function saveLeaderboard(arr) {
+    try {
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(arr));
+    } catch(e) {}
+  }
+
+  function renderLeaderboard() {
+    const list = loadLeaderboard();
+    list.sort((a,b) => a.time - b.time);
+    leaderboardBody.innerHTML = "";
+    list.slice(0,20).forEach((item, idx) => {
+      const tr = document.createElement("tr");
+      const dateStr = item.date || "";
+      tr.innerHTML =
+        "<td>" + (idx+1) + "</td>" +
+        "<td>" + (item.name || "") + "</td>" +
+        "<td>" + item.time.toFixed(2) + "</td>" +
+        "<td>" + (item.mistakes || 0) + "</td>" +
+        "<td>" + dateStr + "</td>";
+      leaderboardBody.appendChild(tr);
+    });
+  }
+
+  saveScoreBtn.addEventListener("click", () => {
+    if (challengeStartTime === null || challengeEndTime === null) return;
+    const name = (playerNameInput.value || "").trim() || "นักเรียน";
+    const totalSec = (challengeEndTime - challengeStartTime) / 1000;
+    const arr = loadLeaderboard();
+    arr.push({
+      name,
+      time: totalSec,
+      mistakes: challengeMistakes,
+      date: new Date().toLocaleDateString("th-TH")
+    });
+    saveLeaderboard(arr);
+    renderLeaderboard();
+    scoreForm.style.display = "none";
+    playerNameInput.value = "";
+  });
+
+  function startAll() {
+    running = true;
+    if (showTimer) {
+      clearTimeout(showTimer);
+      showTimer = null;
+    }
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    applyNumberSize();
+    summaryBox.textContent = "";
+    scoreForm.style.display = "none";
+    answerFeedback.textContent = "";
+    answerInput.value = "";
+
+    if (competitionTimer) {
+      clearInterval(competitionTimer);
+      competitionTimer = null;
+    }
+    if (challengeTimerInterval) {
+      clearInterval(challengeTimerInterval);
+      challengeTimerInterval = null;
+    }
+    timerDisplay.textContent = "";
+
+    if (isChallengeMode()) {
+      questionNumber = 1;
+      challengeCorrectCount = 0;
+      challengeMistakes = 0;
+      challengeStartTime = null;
+      challengeEndTime = null;
+      runCountdownThenStart();
+    } else {
+      let qc = parseInt(questionCountInput.value);
+      if (isNaN(qc)) qc = 5;
+      maxQuestions = Math.max(1, Math.min(99, qc));
+      questionNumber = 1;
+      startCompetitionIfNeeded();
+      runCountdownThenStart();
+    }
+  }
+
+  function stopShowing() {
+    running = false;
+    if (showTimer) {
+      clearTimeout(showTimer);
+      showTimer = null;
+    }
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  function resetAll() {
+    stopShowing();
+    sequence = [];
+    totalAnswer = 0;
+    index = 0;
+    questionNumber = 0;
+    display.textContent = "เริ่ม?";
+    display.classList.remove("anim-pop","anim-fade","anim-slide","anim-flash");
+
+    if (competitionTimer) {
+      clearInterval(competitionTimer);
+      competitionTimer = null;
+    }
+    if (challengeTimerInterval) {
+      clearInterval(challengeTimerInterval);
+      challengeTimerInterval = null;
+    }
+    remainingTime = 0;
+    challengeCorrectCount = 0;
+    challengeMistakes = 0;
+    challengeStartTime = null;
+    challengeEndTime = null;
+
+    timerDisplay.textContent = "";
+    summaryBox.textContent = "";
+    scoreForm.style.display = "none";
+    answerFeedback.textContent = "";
+    answerInput.value = "";
+    applyNumberSize();
+  }
+
+  document.getElementById("startBtn").addEventListener("click", startAll);
+  document.getElementById("stopBtn").addEventListener("click", stopShowing);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  settingsToggle.addEventListener("click", () => {
+    const open = settingsWrapper.classList.contains("open");
+    if (open) settingsWrapper.classList.remove("open");
+    else settingsWrapper.classList.add("open");
+  });
+
+  darkModeToggle.addEventListener("change", () => {
+    applyDarkModeClass();
+    saveSettings();
+  });
+
+  attachSettingChangeListeners();
+  loadSettings();
+  renderLeaderboard();
+})();
 </script>
 </body>
 </html>
