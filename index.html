@@ -1,1534 +1,1373 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>ครูเอฟ จินตคณิต</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ครูเอฟ จินตคณิต - แอปฝึกคิดเลขเร็ว</title>
 
-  <style>
-    :root {
-      --bg: #f2f7ff;
-      --bg-dark: #050816;
-      --card-bg: #ffffff;
-      --card-bg-dark: #0f172a;
-      --text-main: #0f172a;
-      --text-sub: #64748b;
-      --text-main-dark: #e5e7eb;
-      --text-sub-dark: #9ca3af;
+<!-- =======================
+      STYLE SECTION (บล็อกที่ 2 จะถูกแทรกตรงนี้)
+     ======================= -->
+<style>
+/* ========= RESET พื้นฐาน ========= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-      --accent: #fb923c;
-      --accent-soft: #fed7aa;
-      --accent-strong: #f97316;
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #fef3c7; /* โทนเหลืองส้มอ่อน */
+  color: #111827;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 
-      --accent2: #38bdf8;
-      --border-soft: rgba(148,163,184,0.35);
-      --shadow-soft: 0 10px 30px rgba(15,23,42,0.12);
+/* ========= HEADER ========= */
+.app-header {
+  text-align: center;
+  padding: 10px 8px 4px;
+}
 
-      --btn-muted: #6b7280;
-      --btn-danger: #ef4444;
-      --btn-secondary: #9ca3af;
-      --btn-success: #22c55e;
-    }
+.app-header h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ea580c; /* ส้มเข้ม */
+  text-shadow: 0 1px 2px rgba(248, 250, 252, 0.8);
+}
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 20px;
-      background: var(--bg);
-      color: var(--text-main);
-      transition: background 0.3s ease, color 0.3s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body.dark-mode {
-      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
-      color: var(--text-main-dark);
-    }
+/* ========= TOP MENU BAR ========= */
+.menu-bar {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 8px 4px;
+  flex-wrap: wrap;
+}
 
-    body.pseudo-fullscreen {
-      padding-top: 0;
-      justify-content: center;
-      align-items: stretch;
-    }
-    body.pseudo-fullscreen .box {
-      width: 100vw;
-      max-width: 100vw;
-      height: 100vh;
-      border-radius: 0;
-    }
+.menu-bar button {
+  min-width: 70px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: none;
+  background: #f97316;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(249,115,22,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 
-    .box {
-      background: var(--card-bg);
-      border-radius: 20px;
-      box-shadow: var(--shadow-soft);
-      width: 94%;
-      max-width: 480px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 18px 16px 22px;
-      border: 1px solid var(--border-soft);
-      position: relative;
-      overflow: hidden;
-    }
-    body.dark-mode .box {
-      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
-      border-color: rgba(148,163,184,0.4);
-    }
-    .box::before {
-      content: "";
-      position: absolute;
-      top: -60px;
-      left: -80px;
-      width: 220px;
-      height: 220px;
-      background: radial-gradient(circle, rgba(251,146,60,0.35), transparent 70%);
-      pointer-events: none;
-      z-index: -1;
-    }
-    body.dark-mode .box::before {
-      background: radial-gradient(circle, rgba(56,189,248,0.3), transparent 70%);
-    }
+.menu-bar button:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 1px 3px rgba(249,115,22,0.6);
+}
 
-    h2 {
-      margin: 4px 0 2px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-    .subtitle {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      margin-bottom: 8px;
-    }
-    body.dark-mode .subtitle {
-      color: var(--text-sub-dark);
-    }
+/* ========= DISPLAY BOX (ไม่ให้ขยับสูง-ต่ำ) ========= */
+.display-box {
+  margin: 6px auto 4px;
+  width: 90%;
+  max-width: 480px;
+  border-radius: 16px;
+  background: radial-gradient(circle at top, #fed7aa, #fff7ed);
+  border: 1px solid rgba(248, 171, 95, 0.5);
+  box-shadow: 0 6px 16px rgba(248,171,95,0.35);
+  text-align: center;
+  color: #111827;
+  font-weight: 800;
+  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    .settings-wrapper {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.35s ease, opacity 0.35s ease;
-      width: 100%;
-    }
-    .settings-wrapper.open {
-      max-height: 900px;
-      opacity: 1;
-    }
+  /* ความสูงคงที่ เพื่อไม่ให้เมนูเลื่อน */
+  min-height: 120px;
+  max-height: 140px;
+  padding: 10px;
+}
 
-    .settings {
-      background: rgba(248,250,252,0.95);
-      padding: 10px;
-      border-radius: 12px;
-      text-align: left;
-      font-size: 0.82rem;
-      margin-bottom: 10px;
-      border: 1px solid rgba(148,163,184,0.3);
-    }
-    body.dark-mode .settings {
-      background: rgba(15,23,42,0.95);
-      border-color: rgba(148,163,184,0.45);
-    }
+/* ขนาดตัวเลขจะถูก JS ปรับด้วย class หรือ style เพิ่มเติมภายหลังถ้าต้องการ */
 
-    .settings-title {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-sub);
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    body.dark-mode .settings-title {
-      color: var(--text-sub-dark);
-    }
+/* ========= SETTINGS PANEL ========= */
+.settings-panel {
+  width: 90%;
+  max-width: 480px;
+  margin: 6px auto 0;
+  background: #f9fafb;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,0.5);
+  box-shadow: 0 4px 10px rgba(148,163,184,0.2);
+  padding: 10px 12px 12px;
+  font-size: 0.85rem;
+}
 
-    .settings-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      margin-bottom: 6px;
-      flex-wrap: wrap;
-    }
-    .settings-row label {
-      flex: 1.3;
-    }
-    .settings-row select,
-    .settings-row input[type="number"] {
-      flex: 1;
-      padding: 4px 6px;
-      border-radius: 10px;
-      border: 1px solid #cbd5f5;
-      font-size: 0.8rem;
-      box-sizing: border-box;
-      background: #ffffff;
-    }
-    body.dark-mode .settings-row select,
-    body.dark-mode .settings-row input[type="number"] {
-      background: #020617;
-      border-color: #1f2937;
-      color: var(--text-main-dark);
-    }
+.settings-panel h3 {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+}
 
-    .settings-row input[type="checkbox"] {
-      margin-right: 4px;
-    }
+.settings-panel label {
+  display: block;
+  margin-top: 6px;
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: #4b5563;
+}
 
-    .choice-group {
-      flex: 2;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 8px;
-      font-size: 0.8rem;
-    }
-    .choice-group label {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      flex: 0 0 auto;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(148,163,184,0.12);
-    }
-    body.dark-mode .choice-group label {
-      background: rgba(15,23,42,0.9);
-    }
+.settings-panel input[type="number"],
+.settings-panel select {
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  font-size: 0.85rem;
+  background: #ffffff;
+}
 
-    #numberDisplay {
-      font-weight: 800;
-      height: 7.5rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 14px 0 6px;
-      color: #0f172a;
-      text-shadow: 0 0 10px rgba(248,250,252,0.7);
-      background: radial-gradient(circle, rgba(251,191,36,0.12), transparent 70%);
-      border-radius: 16px;
-      font-size: 3.2rem;
-    }
-    body.dark-mode #numberDisplay {
-      color: #f9fafb;
-      text-shadow: 0 0 16px rgba(250,250,250,0.7);
-      background: radial-gradient(circle, rgba(56,189,248,0.18), transparent 70%);
-    }
+.settings-panel hr {
+  border: none;
+  border-top: 1px dashed rgba(148,163,184,0.6);
+  margin: 10px 0 6px;
+}
 
-    .anim-pop  { animation: anim-pop 0.28s ease-out; }
-    .anim-fade { animation: anim-fade 0.35s ease-out; }
-    .anim-slide{ animation: anim-slide 0.32s ease-out; }
-    .anim-flash{ animation: anim-flash 0.25s ease-out; }
+/* ========= ADMIN PANEL ========= */
+#adminPanel h4 {
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: #111827;
+}
 
-    @keyframes anim-pop {
-      0%   { transform: scale(0.6); opacity: 0; }
-      60%  { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(1.0); }
-    }
-    @keyframes anim-fade {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-    @keyframes anim-slide {
-      0%   { transform: translateY(30px); opacity: 0; }
-      100% { transform: translateY(0);   opacity: 1; }
-    }
-    @keyframes anim-flash {
-      0%   { opacity: 0; transform: scale(0.9); }
-      30%  { opacity: 1; transform: scale(1.05); }
-      100% { opacity: 1; transform: scale(1.0); }
-    }
+#adminPanel input {
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  font-size: 0.8rem;
+  background: #ffffff;
+}
 
-    #timerDisplay {
-      font-size: 0.9rem;
-      color: #ef4444;
-      min-height: 1.1em;
-      margin-bottom: 4px;
-    }
+#adminUserList {
+  font-size: 0.78rem;
+}
 
-    .small-note {
-      margin-top: 8px;
-      font-size: 0.76rem;
-      color: var(--text-sub);
-      text-align: left;
-    }
-    body.dark-mode .small-note {
-      color: var(--text-sub-dark);
-    }
+#adminUserList div {
+  border-bottom: 1px solid rgba(209,213,219,0.8);
+}
 
-    /* ปุ่มกลมแถวบนสุด */
-    .controls-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-      margin-bottom: 10px;
-    }
-    .round-btn {
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      border: none;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      box-shadow: 0 4px 10px rgba(15,23,42,0.25);
-      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s;
-      touch-action: manipulation;
-      text-align: center;
-      line-height: 1;
-      box-sizing: border-box;
-    }
-    .round-btn:active {
-      transform: translateY(1px) scale(0.97);
-      box-shadow: 0 2px 6px rgba(15,23,42,0.3);
-      opacity: 0.9;
-    }
-    #settingsToggle { background: #6b7280; }
-    #startBtn      { background: var(--accent-strong); }
-    #stopBtn       { background: var(--btn-danger); }
-    #resetBtn      { background: var(--btn-secondary); }
-    #fullscreenBtn { background: var(--btn-success); }
-    body.dark-mode #settingsToggle { background: #4b5563; }
-    body.dark-mode #resetBtn       { background: #6b7280; }
+#adminUserList div:last-child {
+  border-bottom: none;
+}
 
-    body.theme-blue {
-      --accent: #38bdf8;
-      --accent-soft: #e0f2fe;
-      --accent-strong: #0ea5e9;
-      --bg: #e0f2fe;
-    }
-    body.theme-orange {
-      --accent: #fb923c;
-      --accent-soft: #ffedd5;
-      --accent-strong: #f97316;
-      --bg: #fef3c7;
-    }
-    body.theme-purple {
-      --accent: #c084fc;
-      --accent-soft: #f3e8ff;
-      --accent-strong: #a855f7;
-      --bg: #f5f3ff;
-    }
-    body.theme-green {
-      --accent: #4ade80;
-      --accent-soft: #dcfce7;
-      --accent-strong: #22c55e;
-      --bg: #ecfdf5;
-    }
-    body.dark-mode.theme-blue,
-    body.dark-mode.theme-orange,
-    body.dark-mode.theme-purple,
-    body.dark-mode.theme-green {
-      --bg: #020617;
-    }
+/* ========= KEYPAD / ANSWER AREA ========= */
+.keypad-area {
+  width: 90%;
+  max-width: 480px;
+  margin: 10px auto 14px;
+  background: #f9fafb;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,0.5);
+  box-shadow: 0 4px 10px rgba(148,163,184,0.25);
+  padding: 10px 10px 12px;
+}
 
-    .dark-toggle-label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+.answer-input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 2px solid #f97316;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 8px;
+  background: #ffffff;
+}
 
-    /* ==== Challenge panel & keypad ==== */
-    .challenge-panel {
-      width: 100%;
-      margin-top: 6px;
-      padding: 8px;
-      border-radius: 10px;
-      background: rgba(248,250,252,0.85);
-      border: 1px solid rgba(148,163,184,0.3);
-      box-sizing: border-box;
-      display: none;
-    }
-    body.dark-mode .challenge-panel {
-      background: rgba(15,23,42,0.9);
-      border-color: rgba(148,163,184,0.45);
-    }
-    .challenge-status {
-      font-size: 0.8rem;
-      margin-bottom: 4px;
-      text-align: left;
-      color: var(--text-sub);
-    }
-    body.dark-mode .challenge-status {
-      color: var(--text-sub-dark);
-    }
+/* keypad เป็น grid 3 คอลัมน์ ปุ่มสี่เหลี่ยมจัตุรัส */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
 
-    /* ช่องคำตอบ – ใหญ่ ชัดเจน */
-    #answerInput {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 2px solid #cbd5f5;
-      font-size: 2.4rem;
-      box-sizing: border-box;
-      margin-bottom: 6px;
-      text-align: center;
-      min-height: 4.5rem;
-      background: #ffffff;
-    }
-    body.dark-mode #answerInput {
-      background: #020617;
-      border-color: #1f2937;
-      color: var(--text-main-dark);
-    }
+.keypad button {
+  width: 100%;
+  aspect-ratio: 1 / 1;           /* ทำให้เป็นจัตุรัส */
+  border-radius: 12px;
+  border: none;
+  background: #e5e7eb;
+  box-shadow: 0 2px 4px rgba(107,114,128,0.6);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    #answerFeedback {
-      min-height: 1em;
-      font-size: 0.8rem;
-      margin-bottom: 4px;
-      text-align: center;
-      color: #0f766e;
-    }
-    body.dark-mode #answerFeedback {
-      color: #6ee7b7;
-    }
+.keypad button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 1px 3px rgba(107,114,128,0.7);
+}
 
-    /* keypad – ปุ่มวงกลมใหญ่ กดง่าย (ใช้ขนาดตายตัว ป้องกันยืดบน iPad) */
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .keypad button {
-      border-radius: 50%;
-      border: none;
-      font-size: 1.2rem;
-      font-weight: 700;
-      background: #e5e7eb;
-      color: #111827;
-      box-shadow: 0 2px 4px rgba(15,23,42,0.15);
-      touch-action: manipulation;
-      width: 4.2rem;
-      height: 4.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      box-sizing: border-box;
-    }
-    .keypad button:active {
-      transform: translateY(1px) scale(0.98);
-      box-shadow: 0 1px 3px rgba(15,23,42,0.25);
-    }
-    body.dark-mode .keypad button {
-      background: #1f2937;
-      color: #e5e7eb;
-    }
+/* ปุ่มควบคุมคำตอบ */
+.key-enter,
+.key-back,
+.key-clear {
+  width: 32%;
+  border-radius: 999px;
+  border: none;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-right: 1.5%;
+  color: #fff;
+}
 
-    .keypad .key-enter {
-      grid-column: span 3;
-      border-radius: 999px;
-      height: 54px;
-      width: 100%;
-      background: var(--accent-strong);
-      color: #fff;
-    }
-    .keypad .key-backspace {
-      background: #f97316;
-      color: #fff;
-    }
-    .keypad .key-clear {
-      background: #ef4444;
-      color: #fff;
-    }
+.key-enter {
+  background: #16a34a;
+}
 
-    .summary-box {
-      margin-top: 8px;
-      font-size: 0.8rem;
-      text-align: left;
-      width: 100%;
-      color: var(--text-sub);
-    }
-    body.dark-mode .summary-box {
-      color: var(--text-sub-dark);
-    }
+.key-back {
+  background: #f97316;
+}
 
-    .score-form {
-      width: 100%;
-      margin-top: 6px;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px dashed rgba(148,163,184,0.5);
-      font-size: 0.8rem;
-      display: none;
-      box-sizing: border-box;
-    }
-    .score-form label {
-      display: block;
-      margin-bottom: 4px;
-    }
-    .score-form input {
-      width: 100%;
-      padding: 4px 8px;
-      border-radius: 8px;
-      border: 1px solid #cbd5f5;
-      box-sizing: border-box;
-      margin-bottom: 6px;
-    }
-    body.dark-mode .score-form input {
-      background: #020617;
-      border-color: #1f2937;
-      color: var(--text-main-dark);
-    }
-    .score-form button {
-      width: 100%;
-      padding: 6px 0;
-      border-radius: 10px;
-      border: none;
-      background: var(--accent-strong);
-      color: #fff;
-      font-size: 0.9rem;
-      font-weight: 600;
-      box-shadow: 0 2px 6px rgba(15,23,42,0.25);
-      touch-action: manipulation;
-    }
+.key-clear {
+  background: #dc2626;
+}
 
-    .leaderboard-panel {
-      margin-top: 10px;
-      width: 100%;
-      font-size: 0.78rem;
-      text-align: left;
-    }
-    .leaderboard-panel h3 {
-      margin: 4px 0;
-      font-size: 0.85rem;
-    }
-    .leaderboard-panel table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .leaderboard-panel th,
-    .leaderboard-panel td {
-      border-bottom: 1px solid rgba(148,163,184,0.3);
-      padding: 3px 4px;
-      text-align: left;
-      white-space: nowrap;
-    }
-    .leaderboard-panel th {
-      font-weight: 600;
-    }
-  </style>
+.key-enter:active,
+.key-back:active,
+.key-clear:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* ========= RESPONSIVE ========= */
+@media (min-width: 768px) {
+  .display-box {
+    max-width: 520px;
+    min-height: 140px;
+    max-height: 160px;
+    font-size: 3.5rem;
+  }
+
+  .settings-panel,
+  .keypad-area {
+    max-width: 520px;
+  }
+}
+
+</style>
+
 </head>
-<body class="theme-orange">
-<div class="box" id="appBox">
-  <h2>ครูเอฟ จินตคณิต</h2>
-  <div class="subtitle">แอปฝึกคิดเลขเร็วแบบเกม จินตคณิต</div>
+<body>
 
-  <!-- CONTROLS -->
-  <div class="controls-row">
-    <button id="settingsToggle"  class="round-btn">ตั้งค่า</button>
-    <button id="startBtn"       class="round-btn">เริ่ม</button>
-    <button id="stopBtn"        class="round-btn">หยุด</button>
-    <button id="resetBtn"       class="round-btn">รีเซ็ต</button>
-    <button id="fullscreenBtn"  class="round-btn">เต็มจอ</button>
-  </div>
+<!-- =======================
+      LOGIN OVERLAY
+     ======================= -->
+<div id="loginOverlay" style="
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999;
+">
+  <div style="
+    width: 90%; max-width: 320px;
+    background: white; padding: 20px;
+    border-radius: 16px; text-align: center;
+  ">
+    <h3 style="margin: 0;">เข้าสู่ระบบ</h3>
+    <p style="font-size: 0.85rem; color:#555; margin-top:4px;">
+      ใส่ Username และ Password
+    </p>
 
-  <!-- SETTINGS -->
-  <div id="settingsWrapper" class="settings-wrapper">
-    <div class="settings">
-      <div class="settings-title">โหมดการเล่น</div>
-      <div class="settings-row">
-        <label>เลือกโหมด</label>
-        <div class="choice-group" id="modeGroup">
-          <label><input type="radio" name="modeOption" value="practice" checked> ฝึกฝน</label>
-          <label><input type="radio" name="modeOption" value="challenge"> ท้าทาย</label>
-        </div>
-      </div>
+    <input id="loginUser"
+           type="text"
+           placeholder="Username"
+           style="width: 90%; padding:8px; margin-top:10px;
+                  border-radius:8px; border:1px solid #ccc;">
 
-      <div class="settings-title">การตั้งค่าโจทย์</div>
+    <input id="loginPass"
+           type="password"
+           placeholder="Password"
+           style="width: 90%; padding:8px; margin-top:8px;
+                  border-radius:8px; border:1px solid #ccc;">
 
-      <div class="settings-row">
-        <label for="digitSelect">จำนวนหลักของตัวเลข</label>
-        <select id="digitSelect">
-          <option value="1">1 หลัก (1–9)</option>
-          <option value="2" selected>2 หลัก (10–99)</option>
-          <option value="3">3 หลัก (100–999)</option>
-          <option value="4">4 หลัก (1000–9999)</option>
-        </select>
-      </div>
+    <div id="loginError" style="color:red; font-size:0.8rem; min-height:1.2rem;"></div>
 
-      <div class="settings-row">
-        <label for="countInput">จำนวนตัวเลขต่อ 1 ข้อ</label>
-        <input type="number" id="countInput" value="5" min="1" max="99">
-      </div>
-
-      <div class="settings-row">
-        <label for="questionCountInput">จำนวนข้อใน 1 รอบ (โหมดฝึกฝน)</label>
-        <input type="number" id="questionCountInput" value="5" min="1" max="99">
-      </div>
-
-      <div class="settings-row">
-        <label for="speedInput">ความเร็วแสดงตัวเลข (ms)</label>
-        <input type="number" id="speedInput" value="800" min="1" max="5000">
-      </div>
-
-      <div class="settings-row">
-        <label for="signModeSelect">โหมดเครื่องหมาย</label>
-        <select id="signModeSelect">
-          <option value="add">บวกอย่างเดียว</option>
-          <option value="addsub" selected>บวกลบ</option>
-        </select>
-      </div>
-
-      <div class="settings-title">การแสดงผล</div>
-
-      <div class="settings-row">
-        <label>ขนาดตัวเลข</label>
-        <div class="choice-group" id="sizeGroup">
-          <label><input type="radio" name="sizeOption" value="small"> เล็ก</label>
-          <label><input type="radio" name="sizeOption" value="medium" checked> กลาง</label>
-          <label><input type="radio" name="sizeOption" value="large"> ใหญ่</label>
-          <label><input type="radio" name="sizeOption" value="xl"> XL</label>
-          <label><input type="radio" name="sizeOption" value="xxl"> XXL</label>
-        </div>
-      </div>
-
-      <div class="settings-row">
-        <label>ธีมสี</label>
-        <div class="choice-group" id="themeGroup">
-          <label><input type="radio" name="themeOption" value="orange" checked> ส้มสดใส</label>
-          <label><input type="radio" name="themeOption" value="blue"> ฟ้าสดใส</label>
-          <label><input type="radio" name="themeOption" value="purple"> ม่วง–ชมพู</label>
-          <label><input type="radio" name="themeOption" value="green"> เขียวนีออน</label>
-        </div>
-      </div>
-
-      <div class="settings-row">
-        <label class="dark-toggle-label">
-          <input type="checkbox" id="darkModeToggle">
-          Dark Mode
-        </label>
-      </div>
-
-      <div class="settings-title">โหมดแข่งขัน & เสียง (ใช้กับโหมดฝึกฝน)</div>
-
-      <div class="settings-row">
-        <label>
-          <input type="checkbox" id="competitionCheck">
-          โหมดแข่งขันจับเวลา (ฝึกฝน)
-        </label>
-        <input type="number" id="competitionSeconds" value="60" min="5" max="600"
-               title="เวลาการแข่งขัน (วินาที)">
-      </div>
-
-      <div class="settings-row">
-        <label>
-          <input type="checkbox" id="voiceCheck">
-          เปิดเสียงอ่านตัวเลข/คำตอบ
-        </label>
-        <select id="voiceLangSelect">
-          <option value="th-TH">ไทย (th-TH)</option>
-          <option value="en-US" selected>English (en-US)</option>
-          <option value="ja-JP">日本語 (ja-JP)</option>
-        </select>
-      </div>
-
-      <div class="small-note">
-        * โหมด “ฝึกฝน”: ระบบเฉลยให้, มีตัวเลือกจำนวนข้อ & โหมดแข่งขันเสริม<br>
-        * โหมด “ท้าทาย”: ต้องตอบเองให้ถูก 10 ข้อ, จับเวลาตั้งแต่เลขตัวแรกของข้อที่ 1<br>
-        * ไม่สุ่มเลข 0, ผลรวมระหว่างทางไม่ติดลบ, ผลสุดท้ายไม่ติดลบ<br>
-        * ตั้งค่าทั้งหมดจะถูกจำไว้ในเครื่องอัตโนมัติ
-      </div>
-    </div>
-  </div>
-
-  <div id="timerDisplay"></div>
-  <div id="numberDisplay">เริ่ม?</div>
-
-  <!-- CHALLENGE ANSWER PANEL -->
-  <div id="challengePanel" class="challenge-panel">
-    <div id="challengeStatus" class="challenge-status"></div>
-    <input id="answerInput" type="text" inputmode="numeric" autocomplete="off" placeholder="คำตอบของคุณ">
-    <div id="answerFeedback"></div>
-    <div class="keypad">
-      <button type="button" class="key-digit" data-key="7">7</button>
-      <button type="button" class="key-digit" data-key="8">8</button>
-      <button type="button" class="key-digit" data-key="9">9</button>
-
-      <button type="button" class="key-digit" data-key="4">4</button>
-      <button type="button" class="key-digit" data-key="5">5</button>
-      <button type="button" class="key-digit" data-key="6">6</button>
-
-      <button type="button" class="key-digit" data-key="1">1</button>
-      <button type="button" class="key-digit" data-key="2">2</button>
-      <button type="button" class="key-digit" data-key="3">3</button>
-
-      <button type="button" class="key-backspace">ลบ</button>
-      <button type="button" class="key-digit" data-key="0">0</button>
-      <button type="button" class="key-clear">ล้าง</button>
-
-      <button type="button" class="key-enter">ENTER</button>
-    </div>
-  </div>
-
-  <div id="summaryBox" class="summary-box"></div>
-
-  <div id="scoreForm" class="score-form">
-    <label for="playerNameInput">ชื่อนักเรียน (สำหรับจัดอันดับ):</label>
-    <input id="playerNameInput" type="text" placeholder="เช่น ฟีนิกซ์, ใบตอง">
-    <button id="saveScoreBtn" type="button">บันทึกเวลาโหมดท้าทาย</button>
-  </div>
-
-  <div class="leaderboard-panel">
-    <h3>อันดับโหมดท้าทาย</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>ชื่อ</th>
-          <th>เวลา (วิ)</th>
-          <th>ผิด</th>
-          <th>วันที่</th>
-        </tr>
-      </thead>
-      <tbody id="leaderboardBody"></tbody>
-    </table>
+    <button id="loginBtn"
+            style="padding:8px 20px; margin-top:10px;
+                   border:none; border-radius:999px;
+                   background:#f97316; color:white; font-weight:600;">
+      เข้าสู่ระบบ
+    </button>
   </div>
 </div>
 
+<!-- =======================
+      APP HEADER
+     ======================= -->
+<div class="app-header">
+  <h2>ครูเอฟ จินตคณิต</h2>
+  <div id="currentUserBox" style="font-size:0.85rem; color:#333;"></div>
+</div>
+
+<!-- =======================
+      TOP MENU BAR
+     ======================= -->
+<div class="menu-bar">
+  <button id="btnSettings">ตั้งค่า</button>
+  <button id="btnStart">เริ่ม</button>
+  <button id="btnStop">หยุด</button>
+  <button id="btnReset">รีเซ็ต</button>
+  <button id="btnFullscreen">เต็มจอ</button>
+</div>
+
+<!-- =======================
+      DISPLAY BOX
+     ======================= -->
+<div id="displayBox" class="display-box">พร้อม</div>
+
+<!-- =======================
+      SETTINGS PANEL
+     ======================= -->
+<div id="settingsPanel" class="settings-panel" style="display:none;">
+
+  <h3>การตั้งค่า</h3>
+
+  <label>จำนวนตัวเลขต่อ 1 ข้อ</label>
+  <input id="setCountPerQuestion" type="number" min="1" max="99" value="5">
+
+  <label>จำนวนข้อใน 1 รอบ</label>
+  <input id="setTotalQuestions" type="number" min="1" max="99" value="10">
+
+  <label>ความเร็วการแสดงตัวเลข (ms)</label>
+  <input id="setSpeed" type="number" min="100" max="5000" value="800">
+
+  <label>ขนาดตัวเลข</label>
+  <select id="setFontSize">
+    <option value="small">เล็ก</option>
+    <option value="medium" selected>กลาง</option>
+    <option value="large">ใหญ่</option>
+    <option value="xl">XL</option>
+    <option value="xxl">XXL</option>
+  </select>
+
+  <hr>
+
+  <!-- ADMIN MODE BUTTON -->
+  <button id="adminToggleBtn"
+          style="background:#6b7280; color:white; border:none;
+                 padding:6px 12px; border-radius:8px;">
+    โหมดผู้ดูแล (Admin)
+  </button>
+
+  <!-- =======================
+        ADMIN PANEL
+       ======================= -->
+  <div id="adminPanel" style="display:none; margin-top:10px; 
+                              background:#f3f4f6; padding:12px; border-radius:10px;">
+
+    <h4>จัดการบัญชีผู้ใช้</h4>
+
+    <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px;">
+      <input id="adminNewUser" type="text" placeholder="username"
+             style="flex:1; padding:4px;">
+      <input id="adminNewPass" type="text" placeholder="password"
+             style="flex:1; padding:4px;">
+      <input id="adminNewName" type="text" placeholder="ชื่อแสดง"
+             style="flex:1; padding:4px;">
+      <button id="adminAddUserBtn"
+              style="padding:4px 10px; background:#22c55e; color:white;
+                     border:none; border-radius:6px;">เพิ่ม</button>
+    </div>
+
+    <div style="margin-top:6px; font-weight:600;">รายชื่อผู้ใช้</div>
+    <div id="adminUserList"
+         style="max-height:150px; overflow:auto; background:white;
+                border:1px solid #ddd; padding:6px; border-radius:8px;">
+      (กำลังโหลด…)
+    </div>
+
+    <button id="adminResetAllBtn"
+            style="margin-top:10px; padding:4px 10px; background:#ef4444; color:white;
+                   border:none; border-radius:6px;">
+      รีเซ็ตสถิติทั้งหมด
+    </button>
+
+  </div>
+
+</div>
+
+<!-- =======================
+      CHALLENGE KEYPAD
+     ======================= -->
+<div id="keypadArea" class="keypad-area" style="display:none;">
+  <input id="answerInput" type="text" readonly class="answer-input">
+
+  <div class="keypad">
+    <!-- ปุ่มตัวเลข จะถูกสร้างด้วย JS -->
+  </div>
+
+  <button id="keyEnter" class="key-enter">ENTER</button>
+  <button id="keyBack" class="key-back">ลบ</button>
+  <button id="keyClear" class="key-clear">ล้าง</button>
+</div>
+
+<!-- =======================
+      SCRIPT
+     ======================= -->
 <script>
-(function(){
-  "use strict";
+/********************************************
+ *  บล็อกที่ 3 – JavaScript หลักของแอป
+ *  - Login + Admin
+ *  - โหมดฝึกฝน / ท้าทาย
+ *  - สุ่มเลข / แสดงผล / เก็บสถิติ
+ ********************************************/
 
-  const SETTINGS_KEY = "kruF_jintakanit_settings_v3";
-  const LEADERBOARD_KEY = "kruF_challenge_scores_v1";
+// --------- คีย์สำหรับ localStorage ---------
+const USERS_KEY          = "kruF_users_v1";
+const CURRENT_USER_KEY   = "kruF_current_user_v1";
+const SETTINGS_KEY       = "kruF_settings_v1";
+const ADMIN_PASSWORD     = "KF888";      // รหัส admin ตามที่ครูระบุ
 
-  let sequence = [];
-  let totalAnswer = 0;
-  let index = 0;
-  let showTimer = null;
-  let running = false;
+// --------- ตัวแปรผู้ใช้ / admin ---------
+let users = [];          // {username, password, displayName}[]
+let currentUser = null;
+let isAdminMode = false;
 
-  let competitionTimer = null;
-  let remainingTime = 0;
+// --------- ตัวแปรเกม ---------
+let mode = "practice";          // "practice" หรือ "challenge"
+let isRunning = false;
 
-  let audioCtx = null;
+let numbersPerQuestion = 5;     // จำนวนตัวเลขต่อข้อ
+let totalQuestions = 10;        // จำนวนข้อใน 1 รอบ
+let speedMs = 800;              // ms แสดงตัวเลขแต่ละตัว
+let fontSizeSetting = "medium"; // small/medium/large/xl/xxl
 
-  let questionNumber = 0;
-  let maxQuestions = 1;
+let currentQuestionIndex = 0;   // เริ่มจาก 1 ถึง totalQuestions
+let currentSequence = [];
+let currentAnswer = 0;
+let currentIndexInSeq = 0;
 
-  const CHALLENGE_TARGET = 10;
-  let challengeCorrectCount = 0;
-  let challengeMistakes = 0;
-  let challengeStartTime = null;
-  let challengeEndTime = null;
-  let challengeTimerInterval = null;
+let mainTimer = null;
+let blinkTimer = null;
 
-  const display = document.getElementById("numberDisplay");
-  const digitSelect = document.getElementById("digitSelect");
-  const countInput = document.getElementById("countInput");
-  const questionCountInput = document.getElementById("questionCountInput");
-  const speedInput = document.getElementById("speedInput");
-  const signModeSelect = document.getElementById("signModeSelect");
-  const competitionCheck = document.getElementById("competitionCheck");
-  const competitionSecondsInput = document.getElementById("competitionSeconds");
-  const timerDisplay = document.getElementById("timerDisplay");
-  const voiceCheck = document.getElementById("voiceCheck");
-  const voiceLangSelect = document.getElementById("voiceLangSelect");
+// challenge mode
+let challengeCorrect = 0;
+let challengeMistakes = 0;
+let challengeTarget = 10;
+let challengeStartTime = null;
 
-  const settingsToggle = document.getElementById("settingsToggle");
-  const settingsWrapper = document.getElementById("settingsWrapper");
-  const fullscreenBtn = document.getElementById("fullscreenBtn");
-  const darkModeToggle = document.getElementById("darkModeToggle");
+// --------- อ้างอิง DOM ---------
+const loginOverlay   = document.getElementById("loginOverlay");
+const loginUserInput = document.getElementById("loginUser");
+const loginPassInput = document.getElementById("loginPass");
+const loginBtn       = document.getElementById("loginBtn");
+const loginErrorBox  = document.getElementById("loginError");
 
-  const sizeRadios  = document.querySelectorAll('input[name="sizeOption"]');
-  const themeRadios = document.querySelectorAll('input[name="themeOption"]');
-  const animRadios  = document.querySelectorAll('input[name="animOption"]');
-  const modeRadios  = document.querySelectorAll('input[name="modeOption"]');
+const currentUserBox = document.getElementById("currentUserBox");
 
-  const challengePanel   = document.getElementById("challengePanel");
-  const challengeStatus  = document.getElementById("challengeStatus");
-  const answerInput      = document.getElementById("answerInput");
-  const answerFeedback   = document.getElementById("answerFeedback");
-  const summaryBox       = document.getElementById("summaryBox");
-  const scoreForm        = document.getElementById("scoreForm");
-  const playerNameInput  = document.getElementById("playerNameInput");
-  const saveScoreBtn     = document.getElementById("saveScoreBtn");
-  const leaderboardBody  = document.getElementById("leaderboardBody");
+const btnSettings    = document.getElementById("btnSettings");
+const btnStart       = document.getElementById("btnStart");
+const btnStop        = document.getElementById("btnStop");
+const btnReset       = document.getElementById("btnReset");
+const btnFullscreen  = document.getElementById("btnFullscreen");
 
-  function isChallengeMode(){
-    const sel = document.querySelector('input[name="modeOption"]:checked');
-    return sel && sel.value === "challenge";
+const displayBox     = document.getElementById("displayBox");
+const settingsPanel  = document.getElementById("settingsPanel");
+
+const setCountPerQuestion = document.getElementById("setCountPerQuestion");
+const setTotalQuestions   = document.getElementById("setTotalQuestions");
+const setSpeed            = document.getElementById("setSpeed");
+const setFontSize         = document.getElementById("setFontSize");
+
+const adminToggleBtn      = document.getElementById("adminToggleBtn");
+const adminPanel          = document.getElementById("adminPanel");
+const adminNewUser        = document.getElementById("adminNewUser");
+const adminNewPass        = document.getElementById("adminNewPass");
+const adminNewName        = document.getElementById("adminNewName");
+const adminAddUserBtn     = document.getElementById("adminAddUserBtn");
+const adminUserList       = document.getElementById("adminUserList");
+const adminResetAllBtn    = document.getElementById("adminResetAllBtn");
+
+const keypadArea          = document.getElementById("keypadArea");
+const answerInput         = document.getElementById("answerInput");
+const keypadDiv           = document.querySelector(".keypad");
+const keyEnter            = document.getElementById("keyEnter");
+const keyBack             = document.getElementById("keyBack");
+const keyClear            = document.getElementById("keyClear");
+
+// จะสร้าง selector โหมดการเล่นแบบ dynamic ใน settingsPanel
+let modeSelect = null;
+
+// --------- Audio (Beep เบา ๆ) ---------
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) audioCtx = new AC();
   }
+}
+function playBeep(freq=900, duration=0.08) {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    const osc  = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.01);
+    gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration + 0.03);
+  } catch(e){}
+}
 
-  function applyTheme(themeVal) {
-    document.body.classList.remove("theme-blue","theme-orange","theme-purple","theme-green");
-    if (themeVal === "blue")      document.body.classList.add("theme-blue");
-    else if (themeVal === "purple") document.body.classList.add("theme-purple");
-    else if (themeVal === "green")  document.body.classList.add("theme-green");
-    else                            document.body.classList.add("theme-orange");
+// --------- ฟังก์ชันผู้ใช้ & Login ---------
+function loadUsers() {
+  const raw = localStorage.getItem(USERS_KEY);
+  if (!raw) {
+    // ยังไม่มี user เลย → สร้าง admin เริ่มต้น
+    users = [{
+      username: "admin",
+      password: "KF888",
+      displayName: "ผู้ดูแลระบบ"
+    }];
+    saveUsers();
+    return;
   }
-
-  function applyDarkModeClass() {
-    if (darkModeToggle.checked) document.body.classList.add("dark-mode");
-    else document.body.classList.remove("dark-mode");
-  }
-
-  function applyNumberSize() {
-    const selected = document.querySelector('input[name="sizeOption"]:checked');
-    const val = selected ? selected.value : "medium";
-    let sizeRem = 3.2;
-    if      (val === "small") sizeRem = 2.4;
-    else if (val === "medium")sizeRem = 3.2;
-    else if (val === "large") sizeRem = 4.0;
-    else if (val === "xl")    sizeRem = 5.0;
-    else if (val === "xxl")   sizeRem = 6.0;
-    display.style.fontSize = sizeRem + "rem";
-  }
-
-  function getSelectedAnimationClass() {
-    const sel = document.querySelector('input[name="animOption"]:checked');
-    const val = sel ? sel.value : "pop";
-    if (val === "fade")  return "anim-fade";
-    if (val === "slide") return "anim-slide";
-    if (val === "flash") return "anim-flash";
-    return "anim-pop";
-  }
-
-  function animateDisplayOnce() {
-    const cls = getSelectedAnimationClass();
-    display.classList.remove("anim-pop","anim-fade","anim-slide","anim-flash");
-    void display.offsetWidth;
-    display.classList.add(cls);
-  }
-
-  function updateModeUI() {
-    if (isChallengeMode()) {
-      challengePanel.style.display = "block";
+  try {
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr) && arr.length > 0) {
+      users = arr;
     } else {
-      challengePanel.style.display = "none";
+      users = [{
+        username: "admin",
+        password: "KF888",
+        displayName: "ผู้ดูแลระบบ"
+      }];
+      saveUsers();
     }
+  } catch(e) {
+    users = [{
+      username: "admin",
+      password: "KF888",
+      displayName: "ผู้ดูแลระบบ"
+    }];
+    saveUsers();
+  }
+}
+
+function saveUsers() {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function updateCurrentUserBox() {
+  if (!currentUser) {
+    currentUserBox.innerHTML = `<span style="color:#ef4444;">ยังไม่ได้เข้าสู่ระบบ</span>`;
+    return;
+  }
+  const u = users.find(x => x.username === currentUser);
+  const displayName = u ? (u.displayName || u.username) : currentUser;
+  currentUserBox.innerHTML = `
+    ผู้เล่น: <b>${displayName}</b> (${currentUser})
+    <button onclick="logoutUser()" 
+            style="margin-left:6px; padding:2px 8px; border:none;
+                   border-radius:999px; background:#ef4444; color:white;
+                   font-size:0.75rem;">
+      ออกจากระบบ
+    </button>
+  `;
+}
+
+function tryLogin() {
+  const u = loginUserInput.value.trim();
+  const p = loginPassInput.value.trim();
+  loginErrorBox.textContent = "";
+
+  if (!u || !p) {
+    loginErrorBox.textContent = "กรุณากรอกให้ครบ";
+    return;
+  }
+  const rec = users.find(x => x.username === u);
+  if (!rec) {
+    loginErrorBox.textContent = "ไม่พบ username นี้";
+    return;
+  }
+  if (rec.password !== p) {
+    loginErrorBox.textContent = "รหัสผ่านไม่ถูกต้อง";
+    return;
   }
 
-  function initAudio() {
-    if (!audioCtx) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) audioCtx = new AC();
-    }
-    if (audioCtx && audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
+  currentUser = rec.username;
+  localStorage.setItem(CURRENT_USER_KEY, currentUser);
+  loginOverlay.style.display = "none";
+  updateCurrentUserBox();
+}
+
+function logoutUser() {
+  currentUser = null;
+  localStorage.removeItem(CURRENT_USER_KEY);
+  loginOverlay.style.display = "flex";
+  updateCurrentUserBox();
+  stopGame();
+}
+
+// ให้เรียกจาก HTML (ปุ่ม logout)
+window.logoutUser = logoutUser;
+
+// --------- Admin Mode ---------
+function askAdminPassword() {
+  const input = prompt("กรุณาใส่รหัสผ่านผู้ดูแล (Admin)");
+  if (input === null) return false;
+  if (input === ADMIN_PASSWORD) {
+    alert("เข้าสู่โหมดผู้ดูแลแล้ว");
+    return true;
+  } else {
+    alert("รหัสผ่านไม่ถูกต้อง");
+    return false;
+  }
+}
+
+function renderUserList() {
+  adminUserList.innerHTML = "";
+  if (!users.length) {
+    adminUserList.textContent = "ยังไม่มีผู้ใช้";
+    return;
   }
 
-  function playBeep(freq = 800, duration = 0.12) {
+  users.forEach((u, i) => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.justifyContent = "space-between";
+    row.style.alignItems = "center";
+    row.style.padding = "2px 0";
+
+    // นับสถิติของ user นี้
+    const practiceKey  = "practice_results_" + u.username;
+    const challengeKey = "challenge_results_" + u.username;
+    let pracCount = 0;
+    let chalCount = 0;
+
     try {
-      initAudio();
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration + 0.02);
-    } catch(e) {}
-  }
-
-  function playAnswerFx() {
-    playBeep(900, 0.12);
-    setTimeout(() => playBeep(1200, 0.12), 130);
-  }
-
-  function clampMs(v) {
-    if (isNaN(v)) v = 800;
-    return Math.max(1, Math.min(5000, v));
-  }
-
-  function getSpeechRate() {
-    const showMs = clampMs(parseInt(speedInput.value));
-    let rate = 1000 / showMs;
-    return Math.min(2.0, Math.max(0.5, rate));
-  }
-
-  function speakText(text, langOverride) {
-    if (!voiceCheck.checked) return;
-    if (!("speechSynthesis" in window)) return;
-
-    const lang = langOverride || (voiceLangSelect.value || "en-US");
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = lang;
-    utter.rate = getSpeechRate();
-    window.speechSynthesis.speak(utter);
-  }
-
-  function speakNumber(n) {
-    const lang = voiceLangSelect.value || "en-US";
-    const absStr = Math.abs(n).toString();
-    let text;
-    if (n < 0) {
-      if (lang.startsWith("th"))      text = "ลบ " + absStr;
-      else if (lang.startsWith("ja")) text = "マイナス " + absStr;
-      else                            text = "minus " + absStr;
-    } else {
-      text = absStr;
-    }
-    speakText(text, lang);
-  }
-
-  function speakQuestionNumber(q) {
-    const lang = voiceLangSelect.value || "en-US";
-    let text;
-    if (lang.startsWith("th"))      text = "ข้อที่ " + q;
-    else if (lang.startsWith("ja")) text = "だい " + q + " もん";
-    else                            text = "Question " + q;
-    speakText(text, lang);
-  }
-
-  function speakAnswer(ans) {
-    const lang = voiceLangSelect.value || "en-US";
-    const absStr = Math.abs(ans).toString();
-    let numText;
-    if (ans < 0) {
-      if (lang.startsWith("th"))      numText = "ลบ " + absStr;
-      else if (lang.startsWith("ja")) numText = "マイナス " + absStr;
-      else                            numText = "minus " + absStr;
-    } else {
-      numText = absStr;
-    }
-    let full;
-    if (lang.startsWith("th"))      full = "คำตอบ " + numText;
-    else if (lang.startsWith("ja")) full = "こたえ " + numText;
-    else                            full = "Answer " + numText;
-    speakText(full, lang);
-  }
-
-  function saveSettings() {
-    try {
-      const sizeSel  = document.querySelector('input[name="sizeOption"]:checked');
-      const themeSel = document.querySelector('input[name="themeOption"]:checked');
-      const animSel  = document.querySelector('input[name="animOption"]:checked');
-      const modeSel  = document.querySelector('input[name="modeOption"]:checked');
-
-      const data = {
-        digits: digitSelect.value,
-        countPerQuestion: countInput.value,
-        questionCount: questionCountInput.value,
-        speed: speedInput.value,
-        signMode: signModeSelect.value,
-        competitionEnabled: competitionCheck.checked,
-        competitionSeconds: competitionSecondsInput.value,
-        voiceEnabled: voiceCheck.checked,
-        voiceLang: voiceLangSelect.value,
-        numberSize: sizeSel ? sizeSel.value : "medium",
-        theme: themeSel ? themeSel.value : "orange",
-        animation: animSel ? animSel.value : "pop",
-        darkMode: darkModeToggle.checked,
-        mode: modeSel ? modeSel.value : "practice"
-      };
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
-    } catch(e) {}
-  }
-
-  function loadSettings() {
-    try {
-      const raw = localStorage.getItem(SETTINGS_KEY);
-      if (!raw) {
-        applyTheme("orange");
-        applyDarkModeClass();
-        applyNumberSize();
-        updateModeUI();
-        return;
+      const pRaw = localStorage.getItem(practiceKey);
+      if (pRaw) {
+        const arr = JSON.parse(pRaw);
+        if (Array.isArray(arr)) pracCount = arr.length;
       }
-      const data = JSON.parse(raw);
-
-      if (data.digits) digitSelect.value = data.digits;
-      if (data.countPerQuestion) countInput.value = data.countPerQuestion;
-      if (data.questionCount) questionCountInput.value = data.questionCount;
-      if (data.speed) speedInput.value = data.speed;
-      if (data.signMode) signModeSelect.value = data.signMode;
-      if (typeof data.competitionEnabled === "boolean") competitionCheck.checked = data.competitionEnabled;
-      if (data.competitionSeconds) competitionSecondsInput.value = data.competitionSeconds;
-      if (typeof data.voiceEnabled === "boolean") voiceCheck.checked = data.voiceEnabled;
-      if (data.voiceLang) voiceLangSelect.value = data.voiceLang;
-
-      if (data.numberSize) {
-        const r = document.querySelector('input[name="sizeOption"][value="' + data.numberSize + '"]');
-        if (r) r.checked = true;
+      const cRaw = localStorage.getItem(challengeKey);
+      if (cRaw) {
+        const arr2 = JSON.parse(cRaw);
+        if (Array.isArray(arr2)) chalCount = arr2.length;
       }
-      if (data.theme) {
-        const r = document.querySelector('input[name="themeOption"][value="' + data.theme + '"]');
-        if (r) r.checked = true;
-        applyTheme(data.theme);
-      } else {
-        applyTheme("orange");
-      }
-      if (data.animation) {
-        const r = document.querySelector('input[name="animOption"][value="' + data.animation + '"]');
-        if (r) r.checked = true;
-      }
-      if (typeof data.darkMode === "boolean") {
-        darkModeToggle.checked = data.darkMode;
-      }
-      if (data.mode) {
-        const r = document.querySelector('input[name="modeOption"][value="' + data.mode + '"]');
-        if (r) r.checked = true;
-      }
+    } catch(e){}
 
-      applyDarkModeClass();
-      applyNumberSize();
-      updateModeUI();
-    } catch(e) {
-      applyTheme("orange");
-      applyDarkModeClass();
-      applyNumberSize();
-      updateModeUI();
-    }
-  }
+    const left = document.createElement("span");
+    left.innerHTML = `${i+1}. <b>${u.displayName || u.username}</b> (${u.username})<br>
+      ฝึกฝน: ${pracCount} รอบ | ท้าทาย: ${chalCount} รอบ`;
 
-  function attachSettingChangeListeners() {
-    const elems = [
-      digitSelect, countInput, questionCountInput, speedInput,
-      signModeSelect, competitionCheck, competitionSecondsInput,
-      voiceCheck, voiceLangSelect, darkModeToggle
-    ];
-    elems.forEach(el => {
-      if (!el) return;
-      el.addEventListener("change", saveSettings);
-      el.addEventListener("input",  saveSettings);
-    });
+    const btns = document.createElement("span");
 
-    sizeRadios.forEach(r => r.addEventListener("change", () => {
-      applyNumberSize(); saveSettings();
-    }));
-    themeRadios.forEach(r => r.addEventListener("change", () => {
-      applyTheme(r.value); saveSettings();
-    }));
-    animRadios.forEach(r => r.addEventListener("change", saveSettings));
-    modeRadios.forEach(r => r.addEventListener("change", () => {
-      updateModeUI();
-      saveSettings();
-    }));
-  }
+    const viewBtn = document.createElement("button");
+    viewBtn.textContent = "ดูสถิติ";
+    viewBtn.style.border = "none";
+    viewBtn.style.borderRadius = "999px";
+    viewBtn.style.background = "#3b82f6";
+    viewBtn.style.color = "#fff";
+    viewBtn.style.fontSize = "0.7rem";
+    viewBtn.style.padding = "2px 6px";
+    viewBtn.style.marginRight = "3px";
+    viewBtn.onclick = () => showUserStats(u.username);
 
-  function toggleFullscreen() {
-    const isPseudo = document.body.classList.contains("pseudo-fullscreen");
-    if (!isPseudo) {
-      document.body.classList.add("pseudo-fullscreen");
-      fullscreenBtn.textContent = "ออก";
-      const elem = document.documentElement;
-      try {
-        if (elem.requestFullscreen) elem.requestFullscreen();
-        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-      } catch(e) {}
-    } else {
-      document.body.classList.remove("pseudo-fullscreen");
-      fullscreenBtn.textContent = "เต็มจอ";
-      try {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      } catch(e) {}
-    }
-  }
-  fullscreenBtn.addEventListener("click", toggleFullscreen);
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "แก้ไข";
+    editBtn.style.border = "none";
+    editBtn.style.borderRadius = "999px";
+    editBtn.style.background = "#f59e0b";
+    editBtn.style.color = "#fff";
+    editBtn.style.fontSize = "0.7rem";
+    editBtn.style.padding = "2px 6px";
+    editBtn.style.marginRight = "3px";
+    editBtn.onclick = () => editUser(u.username);
 
-  function startCompetitionIfNeeded() {
-    if (competitionTimer) {
-      clearInterval(competitionTimer);
-      competitionTimer = null;
-    }
-    timerDisplay.textContent = "";
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "ลบ";
+    delBtn.style.border = "none";
+    delBtn.style.borderRadius = "999px";
+    delBtn.style.background = "#ef4444";
+    delBtn.style.color = "#fff";
+    delBtn.style.fontSize = "0.7rem";
+    delBtn.style.padding = "2px 6px";
+    delBtn.onclick = () => deleteUser(u.username);
 
-    if (!competitionCheck.checked) return;
-    if (isChallengeMode()) return;
+    btns.appendChild(viewBtn);
+    btns.appendChild(editBtn);
+    if (u.username !== "admin") btns.appendChild(delBtn);
 
-    let sec = parseInt(competitionSecondsInput.value);
-    if (isNaN(sec)) sec = 60;
-    sec = Math.max(5, Math.min(600, sec));
-
-    remainingTime = sec;
-    timerDisplay.textContent = "เวลา: " + remainingTime + " วินาที";
-
-    competitionTimer = setInterval(() => {
-      remainingTime--;
-      if (remainingTime <= 0) {
-        clearInterval(competitionTimer);
-        competitionTimer = null;
-        timerDisplay.textContent = "หมดเวลา!";
-        running = false;
-      } else {
-        timerDisplay.textContent = "เวลา: " + remainingTime + " วินาที";
-      }
-    }, 1000);
-  }
-
-  function generateSequence() {
-    sequence = [];
-    totalAnswer = 0;
-    index = 0;
-
-    const digits = parseInt(digitSelect.value) || 1;
-    let count = parseInt(countInput.value);
-    if (isNaN(count)) count = 5;
-    count = Math.max(1, Math.min(99, count));
-
-    const signMode = signModeSelect.value;
-    let runningSum = 0;
-
-    for (let i = 0; i < count; i++) {
-      let n;
-      while (true) {
-        const maxAbs = Math.pow(10, digits) - 1;
-        const minAbs = (digits === 1) ? 1 : Math.pow(10, digits - 1);
-        const abs = Math.floor(Math.random() * (maxAbs - minAbs + 1)) + minAbs;
-
-        let sign = 1;
-        if (signMode === "addsub") sign = Math.random() < 0.5 ? -1 : 1;
-        if (signMode === "add") sign = 1;
-
-        n = abs * sign;
-        if (runningSum + n >= 0) break;
-      }
-      sequence.push(n);
-      runningSum += n;
-    }
-
-    totalAnswer = runningSum;
-  }
-
-  function startChallengeTimerIfNeeded() {
-    if (!isChallengeMode()) return;
-    if (challengeStartTime !== null) return;
-    challengeStartTime = performance.now();
-    timerDisplay.textContent = "เวลา: 0.00 วินาที";
-    if (challengeTimerInterval) clearInterval(challengeTimerInterval);
-    challengeTimerInterval = setInterval(() => {
-      if (!running || !isChallengeMode() || challengeStartTime === null) return;
-      const now = performance.now();
-      const sec = (now - challengeStartTime) / 1000;
-      timerDisplay.textContent = "เวลา: " + sec.toFixed(2) + " วินาที";
-    }, 100);
-  }
-
-  function showSequence() {
-    if (!running) return;
-
-    if (index < sequence.length) {
-      if (isChallengeMode() && questionNumber === 1 && index === 0) {
-        startChallengeTimerIfNeeded();
-      }
-
-      const n = sequence[index];
-      display.textContent = n.toString();
-      animateDisplayOnce();
-
-      const freq = n >= 0 ? 1000 : 500;
-      playBeep(freq, 0.1);
-      speakNumber(n);
-
-      index++;
-
-      const showMs  = clampMs(parseInt(speedInput.value));
-      const blankMs = Math.min(200, Math.floor(showMs / 3));
-
-      showTimer = setTimeout(() => {
-        if (!running) return;
-        display.textContent = "";
-        display.classList.remove("anim-pop","anim-fade","anim-slide","anim-flash");
-        showTimer = setTimeout(showSequence, blankMs);
-      }, showMs);
-    } else {
-      if (isChallengeMode()) {
-        enterChallengeAnswerPhase();
-      } else {
-        startAnswerPromptPhase();
-      }
-    }
-  }
-
-  function runCountdownThenStart() {
-    const steps = ["พร้อม!!", "เริ่ม!!"];
-    let idx = 0;
-
-    function nextStep() {
-      if (!running) return;
-      const txt = steps[idx];
-      display.textContent = txt;
-      animateDisplayOnce();
-      speakText(txt);
-
-      if (txt === "พร้อม!!") playBeep(750, 0.16);
-      else if (txt === "เริ่ม!!") playBeep(1100, 0.18);
-
-      idx++;
-      if (idx < steps.length) {
-        showTimer = setTimeout(nextStep, 700);
-      } else {
-        showTimer = setTimeout(() => {
-          if (!running) return;
-          if (isChallengeMode()) startNewChallengeQuestion();
-          else startNewPracticeQuestion();
-        }, 1000);
-      }
-    }
-    nextStep();
-  }
-
-  function startNewPracticeQuestion() {
-    if (!running) return;
-    generateSequence();
-    display.textContent = "ข้อที่ " + questionNumber;
-    animateDisplayOnce();
-    speakQuestionNumber(questionNumber);
-
-    const headerMs = 1000;
-    showTimer = setTimeout(() => {
-      if (!running) return;
-      index = 0;
-      showSequence();
-    }, headerMs);
-  }
-
-  function startNewChallengeQuestion() {
-    if (!running) return;
-    generateSequence();
-    updateChallengeStatus();
-    display.textContent = "ข้อที่ " + questionNumber;
-    animateDisplayOnce();
-    speakQuestionNumber(questionNumber);
-
-    const headerMs = 1000;
-    showTimer = setTimeout(() => {
-      if (!running) return;
-      index = 0;
-      showSequence();
-    }, headerMs);
-  }
-
-  function startAnswerPromptPhase() {
-    if (!running) return;
-    let blinkCount = 0;
-    const totalBlinks = 6;
-    const blinkInterval = 500;
-
-    function blink() {
-      if (!running) return;
-      const showText = (blinkCount % 2 === 0);
-      display.textContent = showText ? "ตอบ" : "";
-      if (showText) playBeep(950, 0.08);
-
-      blinkCount++;
-      if (blinkCount < totalBlinks) {
-        showTimer = setTimeout(blink, blinkInterval);
-      } else {
-        showTimer = setTimeout(() => {
-          if (!running) return;
-          showAnswerThenNext();
-        }, 1000);
-      }
-    }
-    blink();
-  }
-
-  function showAnswerThenNext() {
-    if (!running) return;
-    display.textContent = totalAnswer.toString();
-    animateDisplayOnce();
-    playAnswerFx();
-    speakAnswer(totalAnswer);
-
-    const delayNextQuestion = 2000;
-    showTimer = setTimeout(() => {
-      if (!running) return;
-      questionNumber++;
-      if (questionNumber > maxQuestions) {
-        running = false;
-        display.textContent = "ครบ " + maxQuestions + " ข้อแล้ว";
-        animateDisplayOnce();
-      } else {
-        startNewPracticeQuestion();
-      }
-    }, delayNextQuestion);
-  }
-
-  function updateChallengeStatus() {
-    challengeStatus.textContent = "ข้อที่ " + questionNumber + " / " + CHALLENGE_TARGET +
-                                  " | ผิด: " + challengeMistakes + " ครั้ง";
-  }
-
-  function enterChallengeAnswerPhase() {
-    if (!running) return;
-    display.textContent = "";
-    updateChallengeStatus();
-    answerInput.value = "";
-    answerFeedback.textContent = "พิมพ์คำตอบแล้วกด ENTER";
-    if (answerInput.focus) answerInput.focus();
-  }
-
-  function finishChallenge() {
-    running = false;
-    if (showTimer) {
-      clearTimeout(showTimer);
-      showTimer = null;
-    }
-    if (challengeTimerInterval) {
-      clearInterval(challengeTimerInterval);
-      challengeTimerInterval = null;
-    }
-    if (challengeStartTime !== null) {
-      challengeEndTime = performance.now();
-      const totalSec = (challengeEndTime - challengeStartTime) / 1000;
-      const avgSec = totalSec / CHALLENGE_TARGET;
-      timerDisplay.textContent = "เวลา: " + totalSec.toFixed(2) + " วินาที";
-      display.textContent = "จบโหมดท้าทาย!";
-      animateDisplayOnce();
-      summaryBox.innerHTML =
-        "ใช้เวลา: " + totalSec.toFixed(2) + " วินาที<br>" +
-        "เฉลี่ย: " + avgSec.toFixed(2) + " วินาทีต่อข้อ<br>" +
-        "ตอบผิด: " + challengeMistakes + " ครั้ง";
-      scoreForm.style.display = "block";
-      answerFeedback.textContent = "";
-      answerInput.value = "";
-    }
-  }
-
-  function appendDigit(d) {
-    if (!isChallengeMode()) return;
-    if (!running) return;
-    answerInput.value += d;
-  }
-
-  function doBackspace() {
-    if (!isChallengeMode()) return;
-    if (!running) return;
-    answerInput.value = answerInput.value.slice(0, -1);
-  }
-
-  function doClearInput() {
-    if (!isChallengeMode()) return;
-    if (!running) return;
-    answerInput.value = "";
-  }
-
-  function submitChallengeAnswer() {
-    if (!isChallengeMode()) return;
-    if (!running) return;
-
-    const val = answerInput.value.trim();
-    if (!val) {
-      answerFeedback.textContent = "โปรดกรอกคำตอบ";
-      return;
-    }
-    const userAns = parseInt(val, 10);
-    if (isNaN(userAns)) {
-      answerFeedback.textContent = "โปรดกรอกตัวเลขที่ถูกต้อง";
-      return;
-    }
-
-    if (userAns === totalAnswer) {
-      answerFeedback.textContent = "ถูกต้อง! ไปข้อถัดไป";
-      playAnswerFx();
-      challengeCorrectCount++;
-      if (challengeCorrectCount >= CHALLENGE_TARGET) {
-        setTimeout(finishChallenge, 400);
-      } else {
-        questionNumber++;
-        answerInput.value = "";
-        setTimeout(() => {
-          if (!running) return;
-          startNewChallengeQuestion();
-        }, 600);
-      }
-    } else {
-      challengeMistakes++;
-      playBeep(400, 0.12);
-      answerFeedback.textContent = "ยังไม่ถูก ลองอีกครั้ง";
-      answerInput.value = "";
-      setTimeout(() => {
-        if (!running) return;
-        startNewChallengeQuestion();
-      }, 600);
-    }
-  }
-
-  document.querySelectorAll(".key-digit").forEach(btn => {
-    btn.addEventListener("click", () => {
-      appendDigit(btn.getAttribute("data-key"));
-    });
+    row.appendChild(left);
+    row.appendChild(btns);
+    adminUserList.appendChild(row);
   });
-  const backspaceBtn = document.querySelector(".key-backspace");
-  const clearBtn     = document.querySelector(".key-clear");
-  const enterBtn     = document.querySelector(".key-enter");
+}
 
-  if (backspaceBtn) backspaceBtn.addEventListener("click", doBackspace);
-  if (clearBtn)     clearBtn.addEventListener("click", doClearInput);
-  if (enterBtn)     enterBtn.addEventListener("click", submitChallengeAnswer);
+function showUserStats(username) {
+  const practiceKey  = "practice_results_" + username;
+  const challengeKey = "challenge_results_" + username;
 
-  answerInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      submitChallengeAnswer();
+  let prac = [];
+  let chal = [];
+  try {
+    const pRaw = localStorage.getItem(practiceKey);
+    if (pRaw) {
+      const arr = JSON.parse(pRaw);
+      if (Array.isArray(arr)) prac = arr;
     }
+    const cRaw = localStorage.getItem(challengeKey);
+    if (cRaw) {
+      const arr2 = JSON.parse(cRaw);
+      if (Array.isArray(arr2)) chal = arr2;
+    }
+  } catch(e){}
+
+  let msg = `สถิติของ ${username}\n\n[โหมดฝึกฝน] รอบทั้งหมด: ${prac.length}\n`;
+  prac.slice(-5).forEach((r, idx) => {
+    msg += `- รอบล่าสุด ${prac.length - (prac.slice(-5).length - idx) + 1}: `;
+    msg += `ข้อ: ${r.totalQuestions}, ต่อข้อ: ${r.numbersPerQuestion}, ความเร็ว: ${r.speedMs}ms\n`;
   });
 
-  function loadLeaderboard() {
-    try {
-      const raw = localStorage.getItem(LEADERBOARD_KEY);
-      if (!raw) return [];
-      const data = JSON.parse(raw);
-      if (!Array.isArray(data)) return [];
-      return data;
-    } catch(e) {
-      return [];
+  msg += `\n[โหมดท้าทาย] รอบทั้งหมด: ${chal.length}\n`;
+  chal.slice(-5).forEach((r, idx) => {
+    msg += `- รอบล่าสุด ${chal.length - (chal.slice(-5).length - idx) + 1}: `;
+    msg += `เวลา: ${r.time.toFixed(2)} วินาที, ผิด: ${r.mistakes}\n`;
+  });
+
+  alert(msg);
+}
+
+function editUser(username) {
+  const u = users.find(x => x.username === username);
+  if (!u) return;
+  const newName = prompt("ชื่อแสดงใหม่:", u.displayName || u.username);
+  if (newName === null) return;
+  const newPass = prompt("รหัสผ่านใหม่:", u.password);
+  if (newPass === null) return;
+  u.displayName = newName.trim() || u.username;
+  u.password    = newPass.trim() || u.password;
+  saveUsers();
+  renderUserList();
+  if (currentUser === u.username) updateCurrentUserBox();
+}
+
+function deleteUser(username) {
+  if (!confirm("ต้องการลบผู้ใช้ " + username + " ?")) return;
+  users = users.filter(x => x.username !== username);
+  saveUsers();
+
+  // ลบสถิติของ user นี้ด้วย
+  localStorage.removeItem("practice_results_" + username);
+  localStorage.removeItem("challenge_results_" + username);
+
+  if (currentUser === username) {
+    logoutUser();
+  } else {
+    renderUserList();
+  }
+}
+
+// admin เพิ่ม user
+function addUserFromAdmin() {
+  const uname = (adminNewUser.value || "").trim();
+  const pass  = (adminNewPass.value || "").trim();
+  const name  = (adminNewName.value || "").trim();
+
+  if (!uname || !pass) {
+    alert("ต้องกรอก username และ password");
+    return;
+  }
+  if (users.find(x => x.username === uname)) {
+    alert("มี username นี้แล้ว");
+    return;
+  }
+  users.push({
+    username: uname,
+    password: pass,
+    displayName: name || uname
+  });
+  saveUsers();
+  adminNewUser.value = "";
+  adminNewPass.value = "";
+  adminNewName.value = "";
+  renderUserList();
+}
+
+function resetAllStats() {
+  if (!confirm("รีเซ็ตสถิติของผู้ใช้ทุกคนทั้งหมด?")) return;
+  users.forEach(u => {
+    localStorage.removeItem("practice_results_" + u.username);
+    localStorage.removeItem("challenge_results_" + u.username);
+  });
+  alert("รีเซ็ตสถิติเรียบร้อย");
+  renderUserList();
+}
+
+// --------- Settings (โหมด / จำนวน / ความเร็ว / ขนาดตัวเลข) ---------
+function ensureModeSelector() {
+  // สร้าง select เลือกโหมด ถ้ายังไม่มี
+  if (!settingsPanel) return;
+  if (document.getElementById("setMode")) {
+    modeSelect = document.getElementById("setMode");
+    return;
+  }
+
+  const h3 = settingsPanel.querySelector("h3");
+  if (!h3) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `
+    <label>โหมดการเล่น</label>
+    <select id="setMode" style="width:100%; padding:4px 6px;
+                                border-radius:8px; border:1px solid #cbd5f5;
+                                font-size:0.85rem; background:#fff;">
+      <option value="practice">ฝึกฝน (แสดงเฉลยอัตโนมัติ)</option>
+      <option value="challenge">ท้าทาย (ตอบเองด้วยปุ่มตัวเลข)</option>
+    </select>
+  `;
+  h3.insertAdjacentElement("afterend", wrapper);
+  modeSelect = document.getElementById("setMode");
+}
+
+function loadSettings() {
+  ensureModeSelector();
+  const raw = localStorage.getItem(SETTINGS_KEY);
+  if (!raw) {
+    // defaults
+    numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
+    totalQuestions     = parseInt(setTotalQuestions.value) || 10;
+    speedMs            = parseInt(setSpeed.value) || 800;
+    fontSizeSetting    = setFontSize.value || "medium";
+    mode               = modeSelect ? modeSelect.value : "practice";
+    applyFontSize();
+    updateKeypadVisibility();
+    return;
+  }
+  try {
+    const s = JSON.parse(raw);
+    if (s.numbersPerQuestion != null) {
+      numbersPerQuestion = s.numbersPerQuestion;
+      setCountPerQuestion.value = numbersPerQuestion;
+    }
+    if (s.totalQuestions != null) {
+      totalQuestions = s.totalQuestions;
+      setTotalQuestions.value = totalQuestions;
+    }
+    if (s.speedMs != null) {
+      speedMs = s.speedMs;
+      setSpeed.value = speedMs;
+    }
+    if (s.fontSizeSetting) {
+      fontSizeSetting = s.fontSizeSetting;
+      setFontSize.value = fontSizeSetting;
+    }
+    if (s.mode && modeSelect) {
+      mode = s.mode;
+      modeSelect.value = mode;
+    } else {
+      mode = "practice";
+    }
+    applyFontSize();
+    updateKeypadVisibility();
+  } catch(e){
+    numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
+    totalQuestions     = parseInt(setTotalQuestions.value) || 10;
+    speedMs            = parseInt(setSpeed.value) || 800;
+    fontSizeSetting    = setFontSize.value || "medium";
+    mode               = modeSelect ? modeSelect.value : "practice";
+    applyFontSize();
+    updateKeypadVisibility();
+  }
+}
+
+function saveSettings() {
+  ensureModeSelector();
+  numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
+  totalQuestions     = parseInt(setTotalQuestions.value)   || 10;
+  speedMs            = parseInt(setSpeed.value)            || 800;
+  fontSizeSetting    = setFontSize.value || "medium";
+  mode               = modeSelect ? modeSelect.value : "practice";
+
+  const data = {
+    numbersPerQuestion,
+    totalQuestions,
+    speedMs,
+    fontSizeSetting,
+    mode
+  };
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+  applyFontSize();
+  updateKeypadVisibility();
+}
+
+function applyFontSize() {
+  let sizeRem = 3;
+  switch(fontSizeSetting){
+    case "small": sizeRem = 2.4; break;
+    case "medium": sizeRem = 3; break;
+    case "large": sizeRem = 3.8; break;
+    case "xl": sizeRem = 4.6; break;
+    case "xxl": sizeRem = 5.4; break;
+  }
+  displayBox.style.fontSize = sizeRem + "rem";
+}
+
+function updateKeypadVisibility() {
+  if (mode === "challenge") {
+    keypadArea.style.display = "block";
+  } else {
+    keypadArea.style.display = "none";
+  }
+}
+
+// --------- สุ่มเลข & ลูปแสดงตัวเลข ---------
+function generateSequence() {
+  currentSequence = [];
+  currentAnswer   = 0;
+  currentIndexInSeq = 0;
+
+  const count = Math.max(1, Math.min(99, numbersPerQuestion));
+
+  for (let i = 0; i < count; i++) {
+    // สุ่มเลข 1 หลัก 1–9 (ไม่เอา 0)
+    const n = Math.floor(Math.random() * 9) + 1;
+    currentSequence.push(n);
+    currentAnswer += n;
+  }
+}
+
+function showNextNumber() {
+  if (!isRunning) return;
+
+  if (currentIndexInSeq < currentSequence.length) {
+    const n = currentSequence[currentIndexInSeq];
+    displayBox.textContent = n.toString();
+    playBeep(900, 0.08);
+
+    // เริ่มจับเวลาโหมดท้าทายเมื่อแสดงเลขตัวแรกของข้อแรก
+    if (mode === "challenge" && currentQuestionIndex === 1 && currentIndexInSeq === 0) {
+      if (!challengeStartTime) {
+        challengeStartTime = performance.now();
+      }
+    }
+
+    currentIndexInSeq++;
+
+    const showTime  = Math.max(100, Math.min(5000, speedMs));
+    const blankTime = Math.min(500, Math.floor(showTime / 2));
+
+    mainTimer = setTimeout(() => {
+      if (!isRunning) return;
+      displayBox.textContent = "";
+      mainTimer = setTimeout(showNextNumber, blankTime);
+    }, showTime);
+  } else {
+    // จบลิสต์เลขแล้ว
+    if (mode === "practice") {
+      startPracticeAnswerPhase();
+    } else {
+      startChallengeAnswerPhase();
     }
   }
+}
 
-  function saveLeaderboard(arr) {
+// --------- โหมดฝึกฝน: "ตอบ" กระพริบ แล้วเฉลย ---------
+function startPracticeAnswerPhase() {
+  if (!isRunning) return;
+
+  let count = 0;
+  const totalBlinks = 6; // show/blank = 6 step (3 ครั้ง)
+  const interval = 1000; // 1 วิ ต่อ 1 step
+
+  function blink() {
+    if (!isRunning) return;
+    displayBox.textContent = (count % 2 === 0) ? "ตอบ" : "";
+    if (count % 2 === 0) playBeep(1000, 0.08);
+    count++;
+    if (count < totalBlinks) {
+      blinkTimer = setTimeout(blink, interval);
+    } else {
+      // เว้นอีก 1 วิ แล้วโชว์เฉลย
+      blinkTimer = setTimeout(() => {
+        if (!isRunning) return;
+        displayBox.textContent = currentAnswer.toString();
+        playBeep(1200, 0.12);
+        // รอ 2 วิ แล้วไปข้อถัดไป หรือจบ
+        mainTimer = setTimeout(() => {
+          if (!isRunning) return;
+          if (currentQuestionIndex >= totalQuestions) {
+            finishPracticeSession();
+          } else {
+            currentQuestionIndex++;
+            startQuestion();
+          }
+        }, 2000);
+      }, 1000);
+    }
+  }
+  blink();
+}
+
+function finishPracticeSession() {
+  isRunning = false;
+  displayBox.textContent = `ครบ ${totalQuestions} ข้อ`;
+
+  // บันทึกผลโหมดฝึกฝน
+  if (currentUser) {
+    const key = "practice_results_" + currentUser;
+    let arr = [];
     try {
-      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(arr));
-    } catch(e) {}
-  }
-
-  function renderLeaderboard() {
-    const list = loadLeaderboard();
-    list.sort((a,b) => a.time - b.time);
-    leaderboardBody.innerHTML = "";
-    list.slice(0,20).forEach((item, idx) => {
-      const tr = document.createElement("tr");
-      const dateStr = item.date || "";
-      tr.innerHTML =
-        "<td>" + (idx+1) + "</td>" +
-        "<td>" + (item.name || "") + "</td>" +
-        "<td>" + item.time.toFixed(2) + "</td>" +
-        "<td>" + (item.mistakes || 0) + "</td>" +
-        "<td>" + dateStr + "</td>";
-      leaderboardBody.appendChild(tr);
-    });
-  }
-
-  saveScoreBtn.addEventListener("click", () => {
-    if (challengeStartTime === null || challengeEndTime === null) return;
-    const name = (playerNameInput.value || "").trim() || "นักเรียน";
-    const totalSec = (challengeEndTime - challengeStartTime) / 1000;
-    const arr = loadLeaderboard();
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const tmp = JSON.parse(raw);
+        if (Array.isArray(tmp)) arr = tmp;
+      }
+    } catch(e){}
     arr.push({
-      name,
+      date: new Date().toISOString(),
+      numbersPerQuestion,
+      totalQuestions,
+      speedMs
+    });
+    localStorage.setItem(key, JSON.stringify(arr));
+  }
+}
+
+// --------- โหมดท้าทาย: ตอบผ่าน keypad ---------
+function startChallengeAnswerPhase() {
+  if (!isRunning) return;
+  // แสดงข้อความให้ตอบ
+  displayBox.textContent = "ตอบ";
+  playBeep(1000, 0.08);
+  answerInput.value = "";
+}
+
+function submitChallengeAnswer() {
+  if (!isRunning || mode !== "challenge") return;
+  const val = answerInput.value.trim();
+  if (!val) return;
+
+  const userAns = parseInt(val, 10);
+  if (isNaN(userAns)) {
+    answerInput.value = "";
+    return;
+  }
+
+  if (userAns === currentAnswer) {
+    // ถูก
+    challengeCorrect++;
+    displayBox.textContent = "ถูกต้อง!";
+    playBeep(1200, 0.12);
+    answerInput.value = "";
+
+    if (challengeCorrect >= challengeTarget) {
+      finishChallengeSession();
+    } else {
+      // ไปข้อถัดไป
+      currentQuestionIndex++;
+      mainTimer = setTimeout(() => {
+        if (!isRunning) return;
+        startQuestion();
+      }, 700);
+    }
+  } else {
+    // ผิด → สุ่มโจทย์ใหม่ทันที
+    challengeMistakes++;
+    displayBox.textContent = "ยังไม่ถูก";
+    playBeep(500, 0.12);
+    answerInput.value = "";
+    mainTimer = setTimeout(() => {
+      if (!isRunning) return;
+      // ข้อนี้ใหม่ (ไม่เพิ่มเลขข้อ)
+      startQuestion(/*sameIndex*/);
+    }, 700);
+  }
+}
+
+function finishChallengeSession() {
+  isRunning = false;
+  const endTime = performance.now();
+  let totalSec = 0;
+  if (challengeStartTime != null) {
+    totalSec = (endTime - challengeStartTime) / 1000;
+  }
+  displayBox.textContent = `จบ! ${totalSec.toFixed(2)} วินาที`;
+
+  // บันทึกผลโหมดท้าทาย
+  if (currentUser) {
+    const key = "challenge_results_" + currentUser;
+    let arr = [];
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const tmp = JSON.parse(raw);
+        if (Array.isArray(tmp)) arr = tmp;
+      }
+    } catch(e){}
+    arr.push({
+      date: new Date().toISOString(),
       time: totalSec,
       mistakes: challengeMistakes,
-      date: new Date().toLocaleDateString("th-TH")
+      target: challengeTarget
     });
-    saveLeaderboard(arr);
-    renderLeaderboard();
-    scoreForm.style.display = "none";
-    playerNameInput.value = "";
-  });
-
-  function startAll() {
-    running = true;
-    if (showTimer) {
-      clearTimeout(showTimer);
-      showTimer = null;
-    }
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-
-    applyNumberSize();
-    summaryBox.textContent = "";
-    scoreForm.style.display = "none";
-    answerFeedback.textContent = "";
-    answerInput.value = "";
-
-    if (competitionTimer) {
-      clearInterval(competitionTimer);
-      competitionTimer = null;
-    }
-    if (challengeTimerInterval) {
-      clearInterval(challengeTimerInterval);
-      challengeTimerInterval = null;
-    }
-    timerDisplay.textContent = "";
-
-    if (isChallengeMode()) {
-      questionNumber = 1;
-      challengeCorrectCount = 0;
-      challengeMistakes = 0;
-      challengeStartTime = null;
-      challengeEndTime = null;
-      runCountdownThenStart();
-    } else {
-      let qc = parseInt(questionCountInput.value);
-      if (isNaN(qc)) qc = 5;
-      maxQuestions = Math.max(1, Math.min(99, qc));
-      questionNumber = 1;
-      startCompetitionIfNeeded();
-      runCountdownThenStart();
-    }
+    localStorage.setItem(key, JSON.stringify(arr));
   }
+}
 
-  function stopShowing() {
-    running = false;
-    if (showTimer) {
-      clearTimeout(showTimer);
-      showTimer = null;
-    }
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
+// --------- เริ่มเกม / ปุ่มควบคุมหลัก ---------
+function startGame() {
+  if (!currentUser) {
+    alert("กรุณาเข้าสู่ระบบก่อน");
+    return;
   }
+  saveSettings();
+  if (isRunning) return;
+  isRunning = true;
 
-  function resetAll() {
-    stopShowing();
-    sequence = [];
-    totalAnswer = 0;
-    index = 0;
-    questionNumber = 0;
-    display.textContent = "เริ่ม?";
-    display.classList.remove("anim-pop","anim-fade","anim-slide","anim-flash");
+  // รีเซ็ต state
+  currentQuestionIndex = 1;
+  currentSequence = [];
+  currentAnswer = 0;
+  currentIndexInSeq = 0;
+  clearTimers();
 
-    if (competitionTimer) {
-      clearInterval(competitionTimer);
-      competitionTimer = null;
-    }
-    if (challengeTimerInterval) {
-      clearInterval(challengeTimerInterval);
-      challengeTimerInterval = null;
-    }
-    remainingTime = 0;
-    challengeCorrectCount = 0;
-    challengeMistakes = 0;
-    challengeStartTime = null;
-    challengeEndTime = null;
+  // รีเซ็ตโหมดท้าทาย
+  challengeCorrect = 0;
+  challengeMistakes = 0;
+  challengeTarget = totalQuestions;
+  challengeStartTime = null;
 
-    timerDisplay.textContent = "";
-    summaryBox.textContent = "";
-    scoreForm.style.display = "none";
-    answerFeedback.textContent = "";
-    answerInput.value = "";
-    applyNumberSize();
+  // แสดง "พร้อม!!" แล้ว "เริ่ม!!" แล้วไปข้อ 1
+  displayBox.textContent = "พร้อม!!";
+  playBeep(800, 0.12);
+
+  mainTimer = setTimeout(() => {
+    if (!isRunning) return;
+    displayBox.textContent = "เริ่ม!!";
+    playBeep(1000, 0.12);
+    mainTimer = setTimeout(() => {
+      if (!isRunning) return;
+      startQuestion();
+    }, 800);
+  }, 800);
+}
+
+function startQuestion() {
+  if (!isRunning) return;
+  clearTimers();
+
+  // แสดงเลขข้อก่อน
+  displayBox.textContent = `ข้อ ${currentQuestionIndex}`;
+  playBeep(750, 0.08);
+
+  // สร้างโจทย์ใหม่
+  generateSequence();
+
+  mainTimer = setTimeout(() => {
+    if (!isRunning) return;
+    currentIndexInSeq = 0;
+    showNextNumber();
+  }, 700);
+}
+
+function stopGame() {
+  isRunning = false;
+  clearTimers();
+}
+
+function resetGame() {
+  stopGame();
+  currentSequence = [];
+  currentAnswer = 0;
+  currentIndexInSeq = 0;
+  currentQuestionIndex = 0;
+  challengeCorrect = 0;
+  challengeMistakes = 0;
+  challengeStartTime = null;
+  displayBox.textContent = "พร้อม";
+  answerInput.value = "";
+}
+
+function clearTimers() {
+  if (mainTimer) {
+    clearTimeout(mainTimer);
+    mainTimer = null;
   }
+  if (blinkTimer) {
+    clearTimeout(blinkTimer);
+    blinkTimer = null;
+  }
+}
 
-  document.getElementById("startBtn").addEventListener("click", startAll);
-  document.getElementById("stopBtn").addEventListener("click", stopShowing);
-  document.getElementById("resetBtn").addEventListener("click", resetAll);
+// --------- Fullscreen (กึ่งเต็มจอ) ---------
+function toggleFullscreen() {
+  const docEl = document.documentElement;
+  const isFS = !!(
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement
+  );
 
-  settingsToggle.addEventListener("click", () => {
-    const open = settingsWrapper.classList.contains("open");
-    if (open) settingsWrapper.classList.remove("open");
-    else settingsWrapper.classList.add("open");
+  if (!isFS) {
+    if (docEl.requestFullscreen) docEl.requestFullscreen();
+    else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+    else if (docEl.mozRequestFullScreen) docEl.mozRequestFullScreen();
+    else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+  }
+}
+
+// --------- Keypad / ป้อนคำตอบโหมดท้าทาย ---------
+function buildKeypad() {
+  if (!keypadDiv) return;
+  keypadDiv.innerHTML = "";
+  const layout = [7,8,9,4,5,6,1,2,3,0];
+  layout.forEach(n => {
+    const btn = document.createElement("button");
+    btn.textContent = n.toString();
+    btn.addEventListener("click", () => {
+      answerInput.value += n.toString();
+    });
+    keypadDiv.appendChild(btn);
   });
+}
 
-  darkModeToggle.addEventListener("change", () => {
-    applyDarkModeClass();
-    saveSettings();
-  });
+function handleKeyEnter() { submitChallengeAnswer(); }
+function handleKeyBack() {
+  answerInput.value = answerInput.value.slice(0, -1);
+}
+function handleKeyClear() {
+  answerInput.value = "";
+}
 
-  attachSettingChangeListeners();
+// รองรับคีย์บอร์ดจริงด้วย
+function handleGlobalKeydown(e) {
+  if (!isRunning || mode !== "challenge") return;
+  if (e.key >= "0" && e.key <= "9") {
+    e.preventDefault();
+    answerInput.value += e.key;
+  } else if (e.key === "Backspace") {
+    e.preventDefault();
+    answerInput.value = answerInput.value.slice(0, -1);
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    submitChallengeAnswer();
+  }
+}
+
+// --------- Initial Setup ---------
+window.addEventListener("DOMContentLoaded", () => {
+  // โหลด users + currentUser
+  loadUsers();
+  const stored = localStorage.getItem(CURRENT_USER_KEY);
+  if (stored && users.find(x => x.username === stored)) {
+    currentUser = stored;
+    loginOverlay.style.display = "none";
+  } else {
+    loginOverlay.style.display = "flex";
+  }
+  updateCurrentUserBox();
+
+  // สร้าง selector โหมด
+  ensureModeSelector();
+  // โหลด settings
   loadSettings();
-  renderLeaderboard();
-})();
+
+  // keypad
+  buildKeypad();
+
+  // ปุ่ม login
+  if (loginBtn) {
+    loginBtn.addEventListener("click", () => {
+      tryLogin();
+    });
+  }
+  if (loginUserInput && loginPassInput) {
+    const handler = (e) => {
+      if (e.key === "Enter") {
+        tryLogin();
+      }
+    };
+    loginUserInput.addEventListener("keydown", handler);
+    loginPassInput.addEventListener("keydown", handler);
+  }
+
+  // ปุ่มเมนูหลัก
+  if (btnSettings) {
+    btnSettings.addEventListener("click", () => {
+      if (!settingsPanel) return;
+      const visible = settingsPanel.style.display !== "none";
+      settingsPanel.style.display = visible ? "none" : "block";
+    });
+  }
+  if (btnStart)  btnStart.addEventListener("click", startGame);
+  if (btnStop)   btnStop.addEventListener("click", stopGame);
+  if (btnReset)  btnReset.addEventListener("click", resetGame);
+  if (btnFullscreen) btnFullscreen.addEventListener("click", toggleFullscreen);
+
+  // ปุ่มใน settings เปลี่ยน -> saveSettings
+  [setCountPerQuestion, setTotalQuestions, setSpeed, setFontSize].forEach(el => {
+    if (!el) return;
+    el.addEventListener("change", saveSettings);
+    el.addEventListener("input", saveSettings);
+  });
+  if (modeSelect) {
+    modeSelect.addEventListener("change", saveSettings);
+  }
+
+  // admin toggle
+  if (adminToggleBtn) {
+    adminToggleBtn.addEventListener("click", () => {
+      if (!isAdminMode) {
+        if (askAdminPassword()) {
+          isAdminMode = true;
+          adminPanel.style.display = "block";
+          renderUserList();
+        }
+      } else {
+        isAdminMode = false;
+        adminPanel.style.display = "none";
+      }
+    });
+  }
+  if (adminAddUserBtn) {
+    adminAddUserBtn.addEventListener("click", addUserFromAdmin);
+  }
+  if (adminResetAllBtn) {
+    adminResetAllBtn.addEventListener("click", resetAllStats);
+  }
+
+  // keypad buttons
+  if (keyEnter) keyEnter.addEventListener("click", handleKeyEnter);
+  if (keyBack)  keyBack.addEventListener("click", handleKeyBack);
+  if (keyClear) keyClear.addEventListener("click", handleKeyClear);
+
+  document.addEventListener("keydown", handleGlobalKeydown);
+
+  // ตั้งค่าเริ่มต้นใน display
+  displayBox.textContent = "พร้อม";
+});
+
 </script>
+
 </body>
 </html>
