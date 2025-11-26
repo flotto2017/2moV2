@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ครูเอฟ จินตคณิต - แอปฝึกคิดเลขเร็ว</title>
 
-<!-- =======================
-      STYLE SECTION (บล็อกที่ 2 จะถูกแทรกตรงนี้)
-     ======================= -->
 <style>
 /* ========= RESET พื้นฐาน ========= */
 * {
@@ -37,6 +34,128 @@ body {
   font-weight: 800;
   color: #ea580c; /* ส้มเข้ม */
   text-shadow: 0 1px 2px rgba(248, 250, 252, 0.8);
+}
+
+/* ========= HERO + MASCOT ========= */
+.hero-wrapper {
+  width: 90%;
+  max-width: 480px;
+  margin: 4px auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hero-text {
+  flex: 1.2;
+}
+
+.hero-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ea580c;
+}
+
+.hero-sub {
+  font-size: 0.78rem;
+  color: #4b5563;
+  line-height: 1.3;
+}
+
+.hero-mascot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* วงกลมมาสคอต + อนิเมชั่นลอยขึ้นลง */
+.mascot-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 20%, #fed7aa, #f97316);
+  box-shadow: 0 6px 14px rgba(248,113,22,0.6);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: floatUpDown 2.5s ease-in-out infinite;
+}
+
+.mascot-face {
+  position: absolute;
+  top: 14px;
+  width: 40px;
+  height: 28px;
+  border-radius: 999px;
+  background: #fee2e2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mascot-eyes {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 8px 0;
+}
+
+.mascot-eyes .eye {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #111827;
+}
+
+.mascot-mouth {
+  width: 16px;
+  height: 8px;
+  border-radius: 0 0 999px 999px;
+  border-bottom: 2px solid #f97316;
+  margin: 2px auto 0;
+}
+
+.mascot-abacus {
+  position: absolute;
+  bottom: 6px;
+  right: 4px;
+  font-size: 1rem;
+}
+
+/* กล่องคำพูด */
+.mascot-speech {
+  max-width: 140px;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #fff7ed;
+  border: 1px solid rgba(248,171,95,0.8);
+  color: #7c2d12;
+  position: relative;
+}
+
+.mascot-speech::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 10px;
+  border-width: 0 6px 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent rgba(248,171,95,0.8) transparent;
+}
+
+/* keyframes อนิเมชั่นลอย */
+@keyframes floatUpDown {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0px); }
+}
+
+@media (min-width: 768px) {
+  .hero-wrapper {
+    max-width: 520px;
+  }
 }
 
 /* ========= TOP MENU BAR ========= */
@@ -91,8 +210,6 @@ body {
   max-height: 140px;
   padding: 10px;
 }
-
-/* ขนาดตัวเลขจะถูก JS ปรับด้วย class หรือ style เพิ่มเติมภายหลังถ้าต้องการ */
 
 /* ========= SETTINGS PANEL ========= */
 .settings-panel {
@@ -260,9 +377,7 @@ body {
     max-width: 520px;
   }
 }
-
 </style>
-
 </head>
 <body>
 
@@ -314,6 +429,34 @@ body {
 <div class="app-header">
   <h2>ครูเอฟ จินตคณิต</h2>
   <div id="currentUserBox" style="font-size:0.85rem; color:#333;"></div>
+</div>
+
+<!-- =======================
+      CUTE MASCOT HERO
+     ======================= -->
+<div class="hero-wrapper">
+  <div class="hero-text">
+    <div class="hero-title">เกมคิดเลขไวแบบสนุก</div>
+    <div class="hero-sub">
+      ฝึกบวกเลขให้ไวเหมือนสายฟ้า<br>
+      พร้อมแข่งโหมด “ท้าทาย” กับเพื่อนๆ!
+    </div>
+  </div>
+  <div class="hero-mascot">
+    <div class="mascot-circle">
+      <div class="mascot-face">
+        <div class="mascot-eyes">
+          <span class="eye"></span>
+          <span class="eye"></span>
+        </div>
+        <div class="mascot-mouth"></div>
+      </div>
+      <div class="mascot-abacus">🧮</div>
+    </div>
+    <div class="mascot-speech" id="mascotSpeech">
+      มาลองเล่นกันดูไหม?
+    </div>
+  </div>
 </div>
 
 <!-- =======================
@@ -418,22 +561,16 @@ body {
   <button id="keyClear" class="key-clear">ล้าง</button>
 </div>
 
-<!-- =======================
-      SCRIPT
-     ======================= -->
 <script>
 /********************************************
- *  บล็อกที่ 3 – JavaScript หลักของแอป
- *  - Login + Admin
- *  - โหมดฝึกฝน / ท้าทาย
- *  - สุ่มเลข / แสดงผล / เก็บสถิติ
+ *  JavaScript หลักของแอป
  ********************************************/
 
 // --------- คีย์สำหรับ localStorage ---------
 const USERS_KEY          = "kruF_users_v1";
 const CURRENT_USER_KEY   = "kruF_current_user_v1";
 const SETTINGS_KEY       = "kruF_settings_v1";
-const ADMIN_PASSWORD     = "KF888";      // รหัส admin ตามที่ครูระบุ
+const ADMIN_PASSWORD     = "KF888";      // รหัส admin
 
 // --------- ตัวแปรผู้ใช้ / admin ---------
 let users = [];          // {username, password, displayName}[]
@@ -502,6 +639,8 @@ const keyEnter            = document.getElementById("keyEnter");
 const keyBack             = document.getElementById("keyBack");
 const keyClear            = document.getElementById("keyClear");
 
+const mascotSpeech        = document.getElementById("mascotSpeech");
+
 // จะสร้าง selector โหมดการเล่นแบบ dynamic ใน settingsPanel
 let modeSelect = null;
 
@@ -528,6 +667,11 @@ function playBeep(freq=900, duration=0.08) {
     osc.start();
     osc.stop(audioCtx.currentTime + duration + 0.03);
   } catch(e){}
+}
+
+// --------- มาสคอตพูด ---------
+function setMascotSpeech(text) {
+  if (mascotSpeech) mascotSpeech.textContent = text;
 }
 
 // --------- ฟังก์ชันผู้ใช้ & Login ---------
@@ -610,6 +754,7 @@ function tryLogin() {
   localStorage.setItem(CURRENT_USER_KEY, currentUser);
   loginOverlay.style.display = "none";
   updateCurrentUserBox();
+  setMascotSpeech("สวัสดี " + (rec.displayName || rec.username) + " พร้อมลุยเลขหรือยัง?");
 }
 
 function logoutUser() {
@@ -618,6 +763,7 @@ function logoutUser() {
   loginOverlay.style.display = "flex";
   updateCurrentUserBox();
   stopGame();
+  setMascotSpeech("มาลองเล่นกันดูไหม?");
 }
 
 // ให้เรียกจาก HTML (ปุ่ม logout)
@@ -934,7 +1080,7 @@ function updateKeypadVisibility() {
   }
 }
 
-// --------- สุ่มเลข & ลูปแสดงตัวเลข ---------
+// --------- สุ่มเลข & ลูปแสดงตัวเลข (บวกอย่างเดียว ไม่ติดลบ) ---------
 function generateSequence() {
   currentSequence = [];
   currentAnswer   = 0;
@@ -943,7 +1089,7 @@ function generateSequence() {
   const count = Math.max(1, Math.min(99, numbersPerQuestion));
 
   for (let i = 0; i < count; i++) {
-    // สุ่มเลข 1 หลัก 1–9 (ไม่เอา 0)
+    // สุ่มเลข 1–9 (ไม่เอา 0 และเป็นบวกทั้งหมด)
     const n = Math.floor(Math.random() * 9) + 1;
     currentSequence.push(n);
     currentAnswer += n;
@@ -1006,6 +1152,7 @@ function startPracticeAnswerPhase() {
         if (!isRunning) return;
         displayBox.textContent = currentAnswer.toString();
         playBeep(1200, 0.12);
+        setMascotSpeech("คำตอบคือ " + currentAnswer + " ลองดูข้อถัดไป!");
         // รอ 2 วิ แล้วไปข้อถัดไป หรือจบ
         mainTimer = setTimeout(() => {
           if (!isRunning) return;
@@ -1025,6 +1172,7 @@ function startPracticeAnswerPhase() {
 function finishPracticeSession() {
   isRunning = false;
   displayBox.textContent = `ครบ ${totalQuestions} ข้อ`;
+  setMascotSpeech("เก่งมาก! รอบหน้าลองเพิ่มจำนวนข้อดูไหม?");
 
   // บันทึกผลโหมดฝึกฝน
   if (currentUser) {
@@ -1053,6 +1201,7 @@ function startChallengeAnswerPhase() {
   // แสดงข้อความให้ตอบ
   displayBox.textContent = "ตอบ";
   playBeep(1000, 0.08);
+  setMascotSpeech("ลองคิดให้ไว แล้วกดคำตอบดูเลย!");
   answerInput.value = "";
 }
 
@@ -1073,6 +1222,7 @@ function submitChallengeAnswer() {
     displayBox.textContent = "ถูกต้อง!";
     playBeep(1200, 0.12);
     answerInput.value = "";
+    setMascotSpeech("เยี่ยมเลย! ไปข้อถัดไปกัน!");
 
     if (challengeCorrect >= challengeTarget) {
       finishChallengeSession();
@@ -1090,6 +1240,8 @@ function submitChallengeAnswer() {
     displayBox.textContent = "ยังไม่ถูก";
     playBeep(500, 0.12);
     answerInput.value = "";
+    setMascotSpeech("ไม่เป็นไร ลองข้อใหม่ดูอีกครั้ง!");
+
     mainTimer = setTimeout(() => {
       if (!isRunning) return;
       // ข้อนี้ใหม่ (ไม่เพิ่มเลขข้อ)
@@ -1106,6 +1258,12 @@ function finishChallengeSession() {
     totalSec = (endTime - challengeStartTime) / 1000;
   }
   displayBox.textContent = `จบ! ${totalSec.toFixed(2)} วินาที`;
+
+  if (challengeMistakes === 0) {
+    setMascotSpeech("สุดยอด! ไม่พลาดเลยสักข้อ!");
+  } else {
+    setMascotSpeech("เก่งมาก! รอบหน้าลองลดจำนวนข้อผิดดูนะ");
+  }
 
   // บันทึกผลโหมดท้าทาย
   if (currentUser) {
@@ -1154,6 +1312,7 @@ function startGame() {
   // แสดง "พร้อม!!" แล้ว "เริ่ม!!" แล้วไปข้อ 1
   displayBox.textContent = "พร้อม!!";
   playBeep(800, 0.12);
+  setMascotSpeech("จับตาดูตัวเลขให้ดีนะ!");
 
   mainTimer = setTimeout(() => {
     if (!isRunning) return;
@@ -1200,6 +1359,7 @@ function resetGame() {
   challengeStartTime = null;
   displayBox.textContent = "พร้อม";
   answerInput.value = "";
+  setMascotSpeech("มาลองเล่นกันดูไหม?");
 }
 
 function clearTimers() {
@@ -1213,7 +1373,7 @@ function clearTimers() {
   }
 }
 
-// --------- Fullscreen (กึ่งเต็มจอ) ---------
+// --------- Fullscreen ---------
 function toggleFullscreen() {
   const docEl = document.documentElement;
   const isFS = !!(
@@ -1330,7 +1490,11 @@ window.addEventListener("DOMContentLoaded", () => {
     el.addEventListener("change", saveSettings);
     el.addEventListener("input", saveSettings);
   });
-  if (modeSelect) {
+
+  // modeSelect สร้างใน ensureModeSelector
+  const ms = document.getElementById("setMode");
+  if (ms) {
+    modeSelect = ms;
     modeSelect.addEventListener("change", saveSettings);
   }
 
@@ -1363,10 +1527,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", handleGlobalKeydown);
 
-  // ตั้งค่าเริ่มต้นใน display
+  // ตั้งค่าเริ่มต้นใน display / มาสคอต
   displayBox.textContent = "พร้อม";
+  setMascotSpeech("มาลองเล่นกันดูไหม?");
 });
-
 </script>
 
 </body>
