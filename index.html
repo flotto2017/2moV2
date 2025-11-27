@@ -188,7 +188,7 @@ body {
   box-shadow: 0 1px 3px rgba(249,115,22,0.6);
 }
 
-/* ========= DISPLAY BOX (ไม่ให้ขยับสูง-ต่ำ) ========= */
+/* ========= DISPLAY BOX ========= */
 .display-box {
   margin: 6px auto 4px;
   width: 90%;
@@ -204,8 +204,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* ความสูงคงที่ เพื่อไม่ให้เมนูเลื่อน */
   min-height: 120px;
   max-height: 140px;
   padding: 10px;
@@ -246,6 +244,17 @@ body {
   border: 1px solid #cbd5f5;
   font-size: 0.85rem;
   background: #ffffff;
+}
+
+.settings-panel .inline-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.settings-panel .inline-label input {
+  width: auto;
 }
 
 .settings-panel hr {
@@ -342,10 +351,9 @@ body {
   margin-top: 8px;
 }
 
-/* ปุ่มพื้นฐาน */
 .action-buttons button {
   flex: 1;
-  height: 70px;               /* สูง กดง่ายขึ้น */
+  height: 70px;
   border: none;
   border-radius: 10px;
   font-size: 0.95rem;
@@ -357,23 +365,75 @@ body {
   cursor: pointer;
 }
 
-/* ปุ่ม Delete */
 .btn-delete {
   background: #dc2626;
   color: white;
 }
 
-/* ปุ่ม Clear */
 .btn-clear {
   background: #f97316;
   color: white;
 }
 
-/* ปุ่ม Enter เน้นสีพิเศษ */
 .btn-enter {
   background: #16a34a;
   color: white;
   font-size: 1.05rem;
+}
+
+/* ========= DARK MODE ========= */
+body.dark-mode {
+  background:#020617;
+  color:#e5e7eb;
+}
+
+body.dark-mode .app-header h2 {
+  color:#fb923c;
+  text-shadow:none;
+}
+
+body.dark-mode .display-box {
+  background: radial-gradient(circle at top,#0f172a,#020617);
+  border-color:#334155;
+  color:#e5e7eb;
+}
+
+body.dark-mode .settings-panel,
+body.dark-mode .keypad-area {
+  background:#020617;
+  border-color:#1e293b;
+  box-shadow:0 4px 10px rgba(15,23,42,0.8);
+}
+
+body.dark-mode .settings-panel label,
+body.dark-mode .settings-panel h3 {
+  color:#e5e7eb;
+}
+
+body.dark-mode .settings-panel input[type="number"],
+body.dark-mode .settings-panel select {
+  background:#020617;
+  color:#e5e7eb;
+  border-color:#334155;
+}
+
+body.dark-mode .keypad-area {
+  background:#020617;
+}
+
+body.dark-mode .answer-input {
+  background:#020617;
+  color:#e5e7eb;
+  border-color:#f97316;
+}
+
+body.dark-mode .keypad button {
+  background:#1f2937;
+  color:#e5e7eb;
+}
+
+body.dark-mode .action-buttons button {
+  box-shadow:0 2px 4px rgba(0,0,0,0.7);
 }
 
 /* ========= RESPONSIVE ========= */
@@ -394,9 +454,7 @@ body {
 </head>
 <body>
 
-<!-- =======================
-      LOGIN OVERLAY
-     ======================= -->
+<!-- LOGIN OVERLAY -->
 <div id="loginOverlay" style="
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.6);
@@ -436,17 +494,13 @@ body {
   </div>
 </div>
 
-<!-- =======================
-      APP HEADER
-     ======================= -->
+<!-- HEADER -->
 <div class="app-header">
   <h2>ครูเอฟ จินตคณิต</h2>
   <div id="currentUserBox" style="font-size:0.85rem; color:#333;"></div>
 </div>
 
-<!-- =======================
-      CUTE MASCOT HERO
-     ======================= -->
+<!-- HERO -->
 <div class="hero-wrapper">
   <div class="hero-text">
     <div class="hero-title">เกมคิดเลขไวแบบสนุก</div>
@@ -472,9 +526,7 @@ body {
   </div>
 </div>
 
-<!-- =======================
-      TOP MENU BAR
-     ======================= -->
+<!-- MENU BAR -->
 <div class="menu-bar">
   <button id="btnSettings">ตั้งค่า</button>
   <button id="btnStart">เริ่ม</button>
@@ -483,17 +535,35 @@ body {
   <button id="btnFullscreen">เต็มจอ</button>
 </div>
 
-<!-- =======================
-      DISPLAY BOX
-     ======================= -->
+<!-- DISPLAY BOX -->
 <div id="displayBox" class="display-box">พร้อม</div>
 
-<!-- =======================
-      SETTINGS PANEL
-     ======================= -->
+<!-- SETTINGS PANEL -->
 <div id="settingsPanel" class="settings-panel" style="display:none;">
 
   <h3>การตั้งค่า</h3>
+
+  <label>โหมดการเล่น</label>
+  <select id="setMode">
+    <option value="practice">ฝึกฝน (แสดงเฉลยอัตโนมัติ)</option>
+    <option value="challenge">ท้าทาย (ตอบเองด้วยปุ่มตัวเลข)</option>
+  </select>
+
+  <label>ประเภทโจทย์</label>
+  <select id="setOpType">
+    <option value="plus">บวกอย่างเดียว</option>
+    <option value="plusMinus">บวก + ลบ</option>
+  </select>
+
+  <label class="inline-label">
+    <input type="checkbox" id="setNoZero" checked>
+    ไม่สุ่มเลข 0
+  </label>
+
+  <label class="inline-label">
+    <input type="checkbox" id="setPreventNegative" checked>
+    ไม่ให้ผลรวมระหว่างทางติดลบ
+  </label>
 
   <label>จำนวนตัวเลขต่อ 1 ข้อ</label>
   <input id="setCountPerQuestion" type="number" min="1" max="99" value="5">
@@ -513,18 +583,26 @@ body {
     <option value="xxl">XXL</option>
   </select>
 
+  <label>เสียงเอฟเฟกต์</label>
+  <select id="setSound">
+    <option value="on" selected>เปิดเสียง</option>
+    <option value="off">ปิดเสียง</option>
+  </select>
+
+  <label>ธีม / โหมดจอ</label>
+  <select id="setTheme">
+    <option value="light" selected>โทนสว่าง (ค่าเริ่มต้น)</option>
+    <option value="dark">โทนเข้ม (Dark Mode)</option>
+  </select>
+
   <hr>
 
-  <!-- ADMIN MODE BUTTON -->
   <button id="adminToggleBtn"
           style="background:#6b7280; color:white; border:none;
                  padding:6px 12px; border-radius:8px;">
     โหมดผู้ดูแล (Admin)
   </button>
 
-  <!-- =======================
-        ADMIN PANEL
-       ======================= -->
   <div id="adminPanel" style="display:none; margin-top:10px; 
                               background:#f3f4f6; padding:12px; border-radius:10px;">
 
@@ -559,9 +637,7 @@ body {
 
 </div>
 
-<!-- =======================
-      CHALLENGE KEYPAD
-     ======================= -->
+<!-- CHALLENGE KEYPAD -->
 <div id="keypadArea" class="keypad-area" style="display:none;">
   <input id="answerInput" type="text" readonly class="answer-input">
 
@@ -581,27 +657,33 @@ body {
  *  JavaScript หลักของแอป
  ********************************************/
 
-// --------- คีย์สำหรับ localStorage ---------
+// คีย์สำหรับ localStorage
 const USERS_KEY          = "kruF_users_v1";
 const CURRENT_USER_KEY   = "kruF_current_user_v1";
 const SETTINGS_KEY       = "kruF_settings_v1";
 const ADMIN_PASSWORD     = "KF888";      // รหัส admin
 
-// --------- ตัวแปรผู้ใช้ / admin ---------
-let users = [];          // {username, password, displayName}[]
+// ตัวแปรผู้ใช้ / admin
+let users = [];
 let currentUser = null;
 let isAdminMode = false;
 
-// --------- ตัวแปรเกม ---------
-let mode = "practice";          // "practice" หรือ "challenge"
+// ตัวแปรเกม
+let mode = "practice";        // practice / challenge
+let opType = "plus";          // plus / plusMinus
+let noZero = true;
+let preventNegative = true;
+let soundSetting = "on";      // on / off
+let themeSetting = "light";   // light / dark
+let soundEnabled = true;
+
 let isRunning = false;
+let numbersPerQuestion = 5;
+let totalQuestions = 10;
+let speedMs = 800;
+let fontSizeSetting = "medium";
 
-let numbersPerQuestion = 5;     // จำนวนตัวเลขต่อข้อ
-let totalQuestions = 10;        // จำนวนข้อใน 1 รอบ
-let speedMs = 800;              // ms แสดงตัวเลขแต่ละตัว
-let fontSizeSetting = "medium"; // small/medium/large/xl/xxl
-
-let currentQuestionIndex = 0;   // เริ่มจาก 1 ถึง totalQuestions
+let currentQuestionIndex = 0;
 let currentSequence = [];
 let currentAnswer = 0;
 let currentIndexInSeq = 0;
@@ -615,7 +697,7 @@ let challengeMistakes = 0;
 let challengeTarget = 10;
 let challengeStartTime = null;
 
-// --------- อ้างอิง DOM ---------
+// DOM refs
 const loginOverlay   = document.getElementById("loginOverlay");
 const loginUserInput = document.getElementById("loginUser");
 const loginPassInput = document.getElementById("loginPass");
@@ -633,10 +715,16 @@ const btnFullscreen  = document.getElementById("btnFullscreen");
 const displayBox     = document.getElementById("displayBox");
 const settingsPanel  = document.getElementById("settingsPanel");
 
+const setMode        = document.getElementById("setMode");
+const setOpType      = document.getElementById("setOpType");
+const setNoZero      = document.getElementById("setNoZero");
+const setPreventNegative = document.getElementById("setPreventNegative");
 const setCountPerQuestion = document.getElementById("setCountPerQuestion");
 const setTotalQuestions   = document.getElementById("setTotalQuestions");
 const setSpeed            = document.getElementById("setSpeed");
 const setFontSize         = document.getElementById("setFontSize");
+const setSound            = document.getElementById("setSound");
+const setTheme            = document.getElementById("setTheme");
 
 const adminToggleBtn      = document.getElementById("adminToggleBtn");
 const adminPanel          = document.getElementById("adminPanel");
@@ -656,10 +744,7 @@ const keyClear            = document.getElementById("keyClear");
 
 const mascotSpeech        = document.getElementById("mascotSpeech");
 
-// selector โหมดการเล่นจะถูกสร้างใน settingsPanel
-let modeSelect = null;
-
-// --------- Audio (Beep เบา ๆ) ---------
+// Audio
 let audioCtx = null;
 function initAudio() {
   if (!audioCtx) {
@@ -667,7 +752,9 @@ function initAudio() {
     if (AC) audioCtx = new AC();
   }
 }
+
 function playBeep(freq=900, duration=0.08) {
+  if (!soundEnabled) return;
   try {
     initAudio();
     if (!audioCtx) return;
@@ -684,16 +771,15 @@ function playBeep(freq=900, duration=0.08) {
   } catch(e){}
 }
 
-// --------- มาสคอตพูด ---------
+// Mascot speech
 function setMascotSpeech(text) {
   if (mascotSpeech) mascotSpeech.textContent = text;
 }
 
-// --------- ฟังก์ชันผู้ใช้ & Login ---------
+// Users / login
 function loadUsers() {
   const raw = localStorage.getItem(USERS_KEY);
   if (!raw) {
-    // ยังไม่มี user เลย → สร้าง admin เริ่มต้น
     users = [{
       username: "admin",
       password: "KF888",
@@ -782,7 +868,7 @@ function logoutUser() {
 }
 window.logoutUser = logoutUser;
 
-// --------- Admin Mode ---------
+// Admin
 function askAdminPassword() {
   const input = prompt("กรุณาใส่รหัสผ่านผู้ดูแล (Admin)");
   if (input === null) return false;
@@ -927,10 +1013,8 @@ function deleteUser(username) {
   if (!confirm("ต้องการลบผู้ใช้ " + username + " ?")) return;
   users = users.filter(x => x.username !== username);
   saveUsers();
-
   localStorage.removeItem("practice_results_" + username);
   localStorage.removeItem("challenge_results_" + username);
-
   if (currentUser === username) {
     logoutUser();
   } else {
@@ -973,99 +1057,14 @@ function resetAllStats() {
   renderUserList();
 }
 
-// --------- Settings (โหมด / จำนวน / ความเร็ว / ขนาดตัวเลข) ---------
-function ensureModeSelector() {
-  if (!settingsPanel) return;
-  if (document.getElementById("setMode")) {
-    modeSelect = document.getElementById("setMode");
-    return;
+// Settings
+function applyTheme() {
+  const body = document.body;
+  if (themeSetting === "dark") {
+    body.classList.add("dark-mode");
+  } else {
+    body.classList.remove("dark-mode");
   }
-
-  const h3 = settingsPanel.querySelector("h3");
-  if (!h3) return;
-
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = `
-    <label>โหมดการเล่น</label>
-    <select id="setMode" style="width:100%; padding:4px 6px;
-                                border-radius:8px; border:1px solid #cbd5f5;
-                                font-size:0.85rem; background:#fff;">
-      <option value="practice">ฝึกฝน (แสดงเฉลยอัตโนมัติ)</option>
-      <option value="challenge">ท้าทาย (ตอบเองด้วยปุ่มตัวเลข)</option>
-    </select>
-  `;
-  h3.insertAdjacentElement("afterend", wrapper);
-  modeSelect = document.getElementById("setMode");
-}
-
-function loadSettings() {
-  ensureModeSelector();
-  const raw = localStorage.getItem(SETTINGS_KEY);
-  if (!raw) {
-    numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
-    totalQuestions     = parseInt(setTotalQuestions.value) || 10;
-    speedMs            = parseInt(setSpeed.value) || 800;
-    fontSizeSetting    = setFontSize.value || "medium";
-    mode               = modeSelect ? modeSelect.value : "practice";
-    applyFontSize();
-    updateKeypadVisibility();
-    return;
-  }
-  try {
-    const s = JSON.parse(raw);
-    if (s.numbersPerQuestion != null) {
-      numbersPerQuestion = s.numbersPerQuestion;
-      setCountPerQuestion.value = numbersPerQuestion;
-    }
-    if (s.totalQuestions != null) {
-      totalQuestions = s.totalQuestions;
-      setTotalQuestions.value = totalQuestions;
-    }
-    if (s.speedMs != null) {
-      speedMs = s.speedMs;
-      setSpeed.value = speedMs;
-    }
-    if (s.fontSizeSetting) {
-      fontSizeSetting = s.fontSizeSetting;
-      setFontSize.value = fontSizeSetting;
-    }
-    if (s.mode && modeSelect) {
-      mode = s.mode;
-      modeSelect.value = mode;
-    } else {
-      mode = "practice";
-    }
-    applyFontSize();
-    updateKeypadVisibility();
-  } catch(e){
-    numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
-    totalQuestions     = parseInt(setTotalQuestions.value) || 10;
-    speedMs            = parseInt(setSpeed.value) || 800;
-    fontSizeSetting    = setFontSize.value || "medium";
-    mode               = modeSelect ? modeSelect.value : "practice";
-    applyFontSize();
-    updateKeypadVisibility();
-  }
-}
-
-function saveSettings() {
-  ensureModeSelector();
-  numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
-  totalQuestions     = parseInt(setTotalQuestions.value)   || 10;
-  speedMs            = parseInt(setSpeed.value)            || 800;
-  fontSizeSetting    = setFontSize.value || "medium";
-  mode               = modeSelect ? modeSelect.value : "practice";
-
-  const data = {
-    numbersPerQuestion,
-    totalQuestions,
-    speedMs,
-    fontSizeSetting,
-    mode
-  };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
-  applyFontSize();
-  updateKeypadVisibility();
 }
 
 function applyFontSize() {
@@ -1088,19 +1087,152 @@ function updateKeypadVisibility() {
   }
 }
 
-// --------- สุ่มเลข (บวกอย่างเดียว, ไม่มี 0) ---------
+function loadSettings() {
+  const raw = localStorage.getItem(SETTINGS_KEY);
+  if (!raw) {
+    numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
+    totalQuestions     = parseInt(setTotalQuestions.value) || 10;
+    speedMs            = parseInt(setSpeed.value) || 800;
+    fontSizeSetting    = setFontSize.value || "medium";
+    mode               = setMode.value || "practice";
+    opType             = setOpType.value || "plus";
+    noZero             = setNoZero.checked;
+    preventNegative    = setPreventNegative.checked;
+    soundSetting       = setSound.value || "on";
+    themeSetting       = setTheme.value || "light";
+  } else {
+    try {
+      const s = JSON.parse(raw);
+      if (s.numbersPerQuestion != null) {
+        numbersPerQuestion = s.numbersPerQuestion;
+        setCountPerQuestion.value = numbersPerQuestion;
+      }
+      if (s.totalQuestions != null) {
+        totalQuestions = s.totalQuestions;
+        setTotalQuestions.value = totalQuestions;
+      }
+      if (s.speedMs != null) {
+        speedMs = s.speedMs;
+        setSpeed.value = speedMs;
+      }
+      if (s.fontSizeSetting) {
+        fontSizeSetting = s.fontSizeSetting;
+        setFontSize.value = fontSizeSetting;
+      }
+      mode = s.mode || "practice";
+      setMode.value = mode;
+
+      opType = s.opType || "plus";
+      setOpType.value = opType;
+
+      noZero = typeof s.noZero === "boolean" ? s.noZero : true;
+      setNoZero.checked = noZero;
+
+      preventNegative = typeof s.preventNegative === "boolean" ? s.preventNegative : true;
+      setPreventNegative.checked = preventNegative;
+
+      soundSetting = s.sound || "on";
+      setSound.value = soundSetting;
+
+      themeSetting = s.theme || "light";
+      setTheme.value = themeSetting;
+    } catch(e) {
+      // ถ้า parse error ใช้ค่า default จาก input
+      numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
+      totalQuestions     = parseInt(setTotalQuestions.value) || 10;
+      speedMs            = parseInt(setSpeed.value) || 800;
+      fontSizeSetting    = setFontSize.value || "medium";
+      mode               = setMode.value || "practice";
+      opType             = setOpType.value || "plus";
+      noZero             = setNoZero.checked;
+      preventNegative    = setPreventNegative.checked;
+      soundSetting       = setSound.value || "on";
+      themeSetting       = setTheme.value || "light";
+    }
+  }
+
+  soundEnabled = (soundSetting === "on");
+  applyFontSize();
+  applyTheme();
+  updateKeypadVisibility();
+}
+
+function saveSettings() {
+  numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
+  totalQuestions     = parseInt(setTotalQuestions.value)   || 10;
+  speedMs            = parseInt(setSpeed.value)            || 800;
+  fontSizeSetting    = setFontSize.value || "medium";
+  mode               = setMode.value || "practice";
+  opType             = setOpType.value || "plus";
+  noZero             = setNoZero.checked;
+  preventNegative    = setPreventNegative.checked;
+  soundSetting       = setSound.value || "on";
+  themeSetting       = setTheme.value || "light";
+
+  soundEnabled = (soundSetting === "on");
+
+  const data = {
+    numbersPerQuestion,
+    totalQuestions,
+    speedMs,
+    fontSizeSetting,
+    mode,
+    opType,
+    noZero,
+    preventNegative,
+    sound: soundSetting,
+    theme: themeSetting
+  };
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+
+  applyFontSize();
+  applyTheme();
+  updateKeypadVisibility();
+}
+
+// สุ่มเลข (รองรับบวกอย่างเดียว / บวก-ลบ)
 function generateSequence() {
   currentSequence = [];
   currentAnswer   = 0;
   currentIndexInSeq = 0;
 
   const count = Math.max(1, Math.min(99, numbersPerQuestion));
+  let sum = 0;
 
   for (let i = 0; i < count; i++) {
-    const n = Math.floor(Math.random() * 9) + 1; // 1–9
-    currentSequence.push(n);
-    currentAnswer += n;
+    let value;
+
+    if (opType === "plus") {
+      const min = noZero ? 1 : 0;
+      value = Math.floor(Math.random() * (10 - min)) + min; // min..9
+      sum += value;
+    } else {
+      // บวก + ลบ
+      const min = noZero ? 1 : 0;
+      let mag = Math.floor(Math.random() * (10 - min)) + min; // 1..9 หรือ 0..9
+      let isPlus = Math.random() < 0.5;
+
+      let signed = isPlus ? mag : -mag;
+
+      if (preventNegative && sum + signed < 0) {
+        signed = mag; // บังคับให้เป็นบวก
+      }
+      sum += signed;
+      value = signed;
+    }
+
+    currentSequence.push(value);
   }
+
+  if (preventNegative && sum < 0) {
+    // เผื่อกรณีพิเศษ (ปกติไม่ควรเกิด) ให้ offset ขึ้น
+    const offset = -sum;
+    currentSequence[currentSequence.length - 1] += offset;
+    sum = 0;
+    for (let v of currentSequence) sum += v;
+  }
+
+  currentAnswer = sum;
 }
 
 function showNextNumber() {
@@ -1136,12 +1268,12 @@ function showNextNumber() {
   }
 }
 
-// --------- โหมดฝึกฝน ---------
+// โหมดฝึกฝน
 function startPracticeAnswerPhase() {
   if (!isRunning) return;
 
   let count = 0;
-  const totalBlinks = 6; // 3 ครั้ง (โชว์/ว่าง)
+  const totalBlinks = 6; // 3 ครั้ง
   const interval = 1000;
 
   function blink() {
@@ -1191,13 +1323,16 @@ function finishPracticeSession() {
       date: new Date().toISOString(),
       numbersPerQuestion,
       totalQuestions,
-      speedMs
+      speedMs,
+      opType,
+      noZero,
+      preventNegative
     });
     localStorage.setItem(key, JSON.stringify(arr));
   }
 }
 
-// --------- โหมดท้าทาย ---------
+// โหมดท้าทาย
 function startChallengeAnswerPhase() {
   if (!isRunning) return;
   displayBox.textContent = "ตอบ";
@@ -1276,13 +1411,17 @@ function finishChallengeSession() {
       date: new Date().toISOString(),
       time: totalSec,
       mistakes: challengeMistakes,
-      target: challengeTarget
+      target: challengeTarget,
+      numbersPerQuestion,
+      opType,
+      noZero,
+      preventNegative
     });
     localStorage.setItem(key, JSON.stringify(arr));
   }
 }
 
-// --------- เริ่ม / หยุด / รีเซ็ต ---------
+// เริ่ม / หยุด / รีเซ็ต
 function startGame() {
   if (!currentUser) {
     alert("กรุณาเข้าสู่ระบบก่อน");
@@ -1364,7 +1503,7 @@ function clearTimers() {
   }
 }
 
-// --------- Fullscreen ---------
+// Fullscreen
 function toggleFullscreen() {
   const docEl = document.documentElement;
   const isFS = !!(
@@ -1387,7 +1526,7 @@ function toggleFullscreen() {
   }
 }
 
-// --------- Keypad / ป้อนคำตอบ ---------
+// Keypad & keyboard
 function buildKeypad() {
   if (!keypadDiv) return;
   keypadDiv.innerHTML = "";
@@ -1424,7 +1563,7 @@ function handleGlobalKeydown(e) {
   }
 }
 
-// --------- Initial Setup ---------
+// Initial setup
 window.addEventListener("DOMContentLoaded", () => {
   loadUsers();
   const stored = localStorage.getItem(CURRENT_USER_KEY);
@@ -1436,21 +1575,15 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   updateCurrentUserBox();
 
-  ensureModeSelector();
   loadSettings();
-
   buildKeypad();
 
   if (loginBtn) {
-    loginBtn.addEventListener("click", () => {
-      tryLogin();
-    });
+    loginBtn.addEventListener("click", tryLogin);
   }
   if (loginUserInput && loginPassInput) {
     const handler = (e) => {
-      if (e.key === "Enter") {
-        tryLogin();
-      }
+      if (e.key === "Enter") tryLogin();
     };
     loginUserInput.addEventListener("keydown", handler);
     loginPassInput.addEventListener("keydown", handler);
@@ -1468,17 +1601,22 @@ window.addEventListener("DOMContentLoaded", () => {
   if (btnReset)  btnReset.addEventListener("click", resetGame);
   if (btnFullscreen) btnFullscreen.addEventListener("click", toggleFullscreen);
 
-  [setCountPerQuestion, setTotalQuestions, setSpeed, setFontSize].forEach(el => {
+  [
+    setMode,
+    setOpType,
+    setNoZero,
+    setPreventNegative,
+    setCountPerQuestion,
+    setTotalQuestions,
+    setSpeed,
+    setFontSize,
+    setSound,
+    setTheme
+  ].forEach(el => {
     if (!el) return;
-    el.addEventListener("change", saveSettings);
-    el.addEventListener("input", saveSettings);
+    const evt = el.type === "checkbox" ? "change" : "input";
+    el.addEventListener(evt, saveSettings);
   });
-
-  const ms = document.getElementById("setMode");
-  if (ms) {
-    modeSelect = ms;
-    modeSelect.addEventListener("change", saveSettings);
-  }
 
   if (adminToggleBtn) {
     adminToggleBtn.addEventListener("click", () => {
