@@ -303,22 +303,25 @@ body {
   background: #ffffff;
 }
 
-/* keypad เป็น grid 3 คอลัมน์ ปุ่มสี่เหลี่ยมจัตุรัส */
+/* keypad แถวเดียวแนวนอน 0–9 */
 .keypad {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
   margin-bottom: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .keypad button {
-  width: 100%;
-  aspect-ratio: 1 / 1;           /* ทำให้เป็นจัตุรัส */
-  border-radius: 12px;
+  flex: 1 0 0;
+  min-width: 40px;
+  height: 44px;
+  border-radius: 8px;
   border: none;
   background: #e5e7eb;
   box-shadow: 0 2px 4px rgba(107,114,128,0.6);
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #111827;
   display: flex;
@@ -331,36 +334,46 @@ body {
   box-shadow: 0 1px 3px rgba(107,114,128,0.7);
 }
 
-/* ปุ่มควบคุมคำตอบ */
-.key-enter,
-.key-back,
-.key-clear {
-  width: 32%;
-  border-radius: 999px;
+/* ========= แถบปุ่ม Delete / Clear / Enter ========= */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* ปุ่มพื้นฐาน */
+.action-buttons button {
+  flex: 1;
+  height: 70px;               /* สูง กดง่ายขึ้น */
   border: none;
-  padding: 6px 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-right: 1.5%;
-  color: #fff;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
 }
 
-.key-enter {
-  background: #16a34a;
-}
-
-.key-back {
-  background: #f97316;
-}
-
-.key-clear {
+/* ปุ่ม Delete */
+.btn-delete {
   background: #dc2626;
+  color: white;
 }
 
-.key-enter:active,
-.key-back:active,
-.key-clear:active {
-  transform: translateY(1px) scale(0.97);
+/* ปุ่ม Clear */
+.btn-clear {
+  background: #f97316;
+  color: white;
+}
+
+/* ปุ่ม Enter เน้นสีพิเศษ */
+.btn-enter {
+  background: #16a34a;
+  color: white;
+  font-size: 1.05rem;
 }
 
 /* ========= RESPONSIVE ========= */
@@ -553,12 +566,14 @@ body {
   <input id="answerInput" type="text" readonly class="answer-input">
 
   <div class="keypad">
-    <!-- ปุ่มตัวเลข จะถูกสร้างด้วย JS -->
+    <!-- ปุ่มตัวเลขจะถูกสร้างด้วย JS -->
   </div>
 
-  <button id="keyEnter" class="key-enter">ENTER</button>
-  <button id="keyBack" class="key-back">ลบ</button>
-  <button id="keyClear" class="key-clear">ล้าง</button>
+  <div class="action-buttons">
+    <button id="keyDelete" class="btn-delete">Delete</button>
+    <button id="keyClear"  class="btn-clear">Clear</button>
+    <button id="keyEnter"  class="btn-enter">Enter</button>
+  </div>
 </div>
 
 <script>
@@ -636,12 +651,12 @@ const keypadArea          = document.getElementById("keypadArea");
 const answerInput         = document.getElementById("answerInput");
 const keypadDiv           = document.querySelector(".keypad");
 const keyEnter            = document.getElementById("keyEnter");
-const keyBack             = document.getElementById("keyBack");
+const keyDelete           = document.getElementById("keyDelete");
 const keyClear            = document.getElementById("keyClear");
 
 const mascotSpeech        = document.getElementById("mascotSpeech");
 
-// จะสร้าง selector โหมดการเล่นแบบ dynamic ใน settingsPanel
+// selector โหมดการเล่นจะถูกสร้างใน settingsPanel
 let modeSelect = null;
 
 // --------- Audio (Beep เบา ๆ) ---------
@@ -765,8 +780,6 @@ function logoutUser() {
   stopGame();
   setMascotSpeech("มาลองเล่นกันดูไหม?");
 }
-
-// ให้เรียกจาก HTML (ปุ่ม logout)
 window.logoutUser = logoutUser;
 
 // --------- Admin Mode ---------
@@ -796,7 +809,6 @@ function renderUserList() {
     row.style.alignItems = "center";
     row.style.padding = "2px 0";
 
-    // นับสถิติของ user นี้
     const practiceKey  = "practice_results_" + u.username;
     const challengeKey = "challenge_results_" + u.username;
     let pracCount = 0;
@@ -916,7 +928,6 @@ function deleteUser(username) {
   users = users.filter(x => x.username !== username);
   saveUsers();
 
-  // ลบสถิติของ user นี้ด้วย
   localStorage.removeItem("practice_results_" + username);
   localStorage.removeItem("challenge_results_" + username);
 
@@ -927,7 +938,6 @@ function deleteUser(username) {
   }
 }
 
-// admin เพิ่ม user
 function addUserFromAdmin() {
   const uname = (adminNewUser.value || "").trim();
   const pass  = (adminNewPass.value || "").trim();
@@ -965,7 +975,6 @@ function resetAllStats() {
 
 // --------- Settings (โหมด / จำนวน / ความเร็ว / ขนาดตัวเลข) ---------
 function ensureModeSelector() {
-  // สร้าง select เลือกโหมด ถ้ายังไม่มี
   if (!settingsPanel) return;
   if (document.getElementById("setMode")) {
     modeSelect = document.getElementById("setMode");
@@ -993,7 +1002,6 @@ function loadSettings() {
   ensureModeSelector();
   const raw = localStorage.getItem(SETTINGS_KEY);
   if (!raw) {
-    // defaults
     numbersPerQuestion = parseInt(setCountPerQuestion.value) || 5;
     totalQuestions     = parseInt(setTotalQuestions.value) || 10;
     speedMs            = parseInt(setSpeed.value) || 800;
@@ -1080,7 +1088,7 @@ function updateKeypadVisibility() {
   }
 }
 
-// --------- สุ่มเลข & ลูปแสดงตัวเลข (บวกอย่างเดียว ไม่ติดลบ) ---------
+// --------- สุ่มเลข (บวกอย่างเดียว, ไม่มี 0) ---------
 function generateSequence() {
   currentSequence = [];
   currentAnswer   = 0;
@@ -1089,8 +1097,7 @@ function generateSequence() {
   const count = Math.max(1, Math.min(99, numbersPerQuestion));
 
   for (let i = 0; i < count; i++) {
-    // สุ่มเลข 1–9 (ไม่เอา 0 และเป็นบวกทั้งหมด)
-    const n = Math.floor(Math.random() * 9) + 1;
+    const n = Math.floor(Math.random() * 9) + 1; // 1–9
     currentSequence.push(n);
     currentAnswer += n;
   }
@@ -1104,7 +1111,6 @@ function showNextNumber() {
     displayBox.textContent = n.toString();
     playBeep(900, 0.08);
 
-    // เริ่มจับเวลาโหมดท้าทายเมื่อแสดงเลขตัวแรกของข้อแรก
     if (mode === "challenge" && currentQuestionIndex === 1 && currentIndexInSeq === 0) {
       if (!challengeStartTime) {
         challengeStartTime = performance.now();
@@ -1122,7 +1128,6 @@ function showNextNumber() {
       mainTimer = setTimeout(showNextNumber, blankTime);
     }, showTime);
   } else {
-    // จบลิสต์เลขแล้ว
     if (mode === "practice") {
       startPracticeAnswerPhase();
     } else {
@@ -1131,13 +1136,13 @@ function showNextNumber() {
   }
 }
 
-// --------- โหมดฝึกฝน: "ตอบ" กระพริบ แล้วเฉลย ---------
+// --------- โหมดฝึกฝน ---------
 function startPracticeAnswerPhase() {
   if (!isRunning) return;
 
   let count = 0;
-  const totalBlinks = 6; // show/blank = 6 step (3 ครั้ง)
-  const interval = 1000; // 1 วิ ต่อ 1 step
+  const totalBlinks = 6; // 3 ครั้ง (โชว์/ว่าง)
+  const interval = 1000;
 
   function blink() {
     if (!isRunning) return;
@@ -1147,13 +1152,11 @@ function startPracticeAnswerPhase() {
     if (count < totalBlinks) {
       blinkTimer = setTimeout(blink, interval);
     } else {
-      // เว้นอีก 1 วิ แล้วโชว์เฉลย
       blinkTimer = setTimeout(() => {
         if (!isRunning) return;
         displayBox.textContent = currentAnswer.toString();
         playBeep(1200, 0.12);
         setMascotSpeech("คำตอบคือ " + currentAnswer + " ลองดูข้อถัดไป!");
-        // รอ 2 วิ แล้วไปข้อถัดไป หรือจบ
         mainTimer = setTimeout(() => {
           if (!isRunning) return;
           if (currentQuestionIndex >= totalQuestions) {
@@ -1174,7 +1177,6 @@ function finishPracticeSession() {
   displayBox.textContent = `ครบ ${totalQuestions} ข้อ`;
   setMascotSpeech("เก่งมาก! รอบหน้าลองเพิ่มจำนวนข้อดูไหม?");
 
-  // บันทึกผลโหมดฝึกฝน
   if (currentUser) {
     const key = "practice_results_" + currentUser;
     let arr = [];
@@ -1195,10 +1197,9 @@ function finishPracticeSession() {
   }
 }
 
-// --------- โหมดท้าทาย: ตอบผ่าน keypad ---------
+// --------- โหมดท้าทาย ---------
 function startChallengeAnswerPhase() {
   if (!isRunning) return;
-  // แสดงข้อความให้ตอบ
   displayBox.textContent = "ตอบ";
   playBeep(1000, 0.08);
   setMascotSpeech("ลองคิดให้ไว แล้วกดคำตอบดูเลย!");
@@ -1217,7 +1218,6 @@ function submitChallengeAnswer() {
   }
 
   if (userAns === currentAnswer) {
-    // ถูก
     challengeCorrect++;
     displayBox.textContent = "ถูกต้อง!";
     playBeep(1200, 0.12);
@@ -1227,7 +1227,6 @@ function submitChallengeAnswer() {
     if (challengeCorrect >= challengeTarget) {
       finishChallengeSession();
     } else {
-      // ไปข้อถัดไป
       currentQuestionIndex++;
       mainTimer = setTimeout(() => {
         if (!isRunning) return;
@@ -1235,7 +1234,6 @@ function submitChallengeAnswer() {
       }, 700);
     }
   } else {
-    // ผิด → สุ่มโจทย์ใหม่ทันที
     challengeMistakes++;
     displayBox.textContent = "ยังไม่ถูก";
     playBeep(500, 0.12);
@@ -1244,8 +1242,7 @@ function submitChallengeAnswer() {
 
     mainTimer = setTimeout(() => {
       if (!isRunning) return;
-      // ข้อนี้ใหม่ (ไม่เพิ่มเลขข้อ)
-      startQuestion(/*sameIndex*/);
+      startQuestion(); // ข้อนี้ใหม่
     }, 700);
   }
 }
@@ -1265,7 +1262,6 @@ function finishChallengeSession() {
     setMascotSpeech("เก่งมาก! รอบหน้าลองลดจำนวนข้อผิดดูนะ");
   }
 
-  // บันทึกผลโหมดท้าทาย
   if (currentUser) {
     const key = "challenge_results_" + currentUser;
     let arr = [];
@@ -1286,7 +1282,7 @@ function finishChallengeSession() {
   }
 }
 
-// --------- เริ่มเกม / ปุ่มควบคุมหลัก ---------
+// --------- เริ่ม / หยุด / รีเซ็ต ---------
 function startGame() {
   if (!currentUser) {
     alert("กรุณาเข้าสู่ระบบก่อน");
@@ -1296,20 +1292,17 @@ function startGame() {
   if (isRunning) return;
   isRunning = true;
 
-  // รีเซ็ต state
   currentQuestionIndex = 1;
   currentSequence = [];
   currentAnswer = 0;
   currentIndexInSeq = 0;
   clearTimers();
 
-  // รีเซ็ตโหมดท้าทาย
   challengeCorrect = 0;
   challengeMistakes = 0;
   challengeTarget = totalQuestions;
   challengeStartTime = null;
 
-  // แสดง "พร้อม!!" แล้ว "เริ่ม!!" แล้วไปข้อ 1
   displayBox.textContent = "พร้อม!!";
   playBeep(800, 0.12);
   setMascotSpeech("จับตาดูตัวเลขให้ดีนะ!");
@@ -1329,11 +1322,9 @@ function startQuestion() {
   if (!isRunning) return;
   clearTimers();
 
-  // แสดงเลขข้อก่อน
   displayBox.textContent = `ข้อ ${currentQuestionIndex}`;
   playBeep(750, 0.08);
 
-  // สร้างโจทย์ใหม่
   generateSequence();
 
   mainTimer = setTimeout(() => {
@@ -1396,11 +1387,11 @@ function toggleFullscreen() {
   }
 }
 
-// --------- Keypad / ป้อนคำตอบโหมดท้าทาย ---------
+// --------- Keypad / ป้อนคำตอบ ---------
 function buildKeypad() {
   if (!keypadDiv) return;
   keypadDiv.innerHTML = "";
-  const layout = [7,8,9,4,5,6,1,2,3,0];
+  const layout = [0,1,2,3,4,5,6,7,8,9];
   layout.forEach(n => {
     const btn = document.createElement("button");
     btn.textContent = n.toString();
@@ -1419,7 +1410,6 @@ function handleKeyClear() {
   answerInput.value = "";
 }
 
-// รองรับคีย์บอร์ดจริงด้วย
 function handleGlobalKeydown(e) {
   if (!isRunning || mode !== "challenge") return;
   if (e.key >= "0" && e.key <= "9") {
@@ -1436,7 +1426,6 @@ function handleGlobalKeydown(e) {
 
 // --------- Initial Setup ---------
 window.addEventListener("DOMContentLoaded", () => {
-  // โหลด users + currentUser
   loadUsers();
   const stored = localStorage.getItem(CURRENT_USER_KEY);
   if (stored && users.find(x => x.username === stored)) {
@@ -1447,15 +1436,11 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   updateCurrentUserBox();
 
-  // สร้าง selector โหมด
   ensureModeSelector();
-  // โหลด settings
   loadSettings();
 
-  // keypad
   buildKeypad();
 
-  // ปุ่ม login
   if (loginBtn) {
     loginBtn.addEventListener("click", () => {
       tryLogin();
@@ -1471,7 +1456,6 @@ window.addEventListener("DOMContentLoaded", () => {
     loginPassInput.addEventListener("keydown", handler);
   }
 
-  // ปุ่มเมนูหลัก
   if (btnSettings) {
     btnSettings.addEventListener("click", () => {
       if (!settingsPanel) return;
@@ -1484,21 +1468,18 @@ window.addEventListener("DOMContentLoaded", () => {
   if (btnReset)  btnReset.addEventListener("click", resetGame);
   if (btnFullscreen) btnFullscreen.addEventListener("click", toggleFullscreen);
 
-  // ปุ่มใน settings เปลี่ยน -> saveSettings
   [setCountPerQuestion, setTotalQuestions, setSpeed, setFontSize].forEach(el => {
     if (!el) return;
     el.addEventListener("change", saveSettings);
     el.addEventListener("input", saveSettings);
   });
 
-  // modeSelect สร้างใน ensureModeSelector
   const ms = document.getElementById("setMode");
   if (ms) {
     modeSelect = ms;
     modeSelect.addEventListener("change", saveSettings);
   }
 
-  // admin toggle
   if (adminToggleBtn) {
     adminToggleBtn.addEventListener("click", () => {
       if (!isAdminMode) {
@@ -1520,14 +1501,12 @@ window.addEventListener("DOMContentLoaded", () => {
     adminResetAllBtn.addEventListener("click", resetAllStats);
   }
 
-  // keypad buttons
-  if (keyEnter) keyEnter.addEventListener("click", handleKeyEnter);
-  if (keyBack)  keyBack.addEventListener("click", handleKeyBack);
-  if (keyClear) keyClear.addEventListener("click", handleKeyClear);
+  if (keyEnter)  keyEnter.addEventListener("click", handleKeyEnter);
+  if (keyDelete) keyDelete.addEventListener("click", handleKeyBack);
+  if (keyClear)  keyClear.addEventListener("click", handleKeyClear);
 
   document.addEventListener("keydown", handleGlobalKeydown);
 
-  // ตั้งค่าเริ่มต้นใน display / มาสคอต
   displayBox.textContent = "พร้อม";
   setMascotSpeech("มาลองเล่นกันดูไหม?");
 });
