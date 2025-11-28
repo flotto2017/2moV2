@@ -2,7 +2,8 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ครูเอฟ จินตคณิต - แอปฝึกคิดเลขเร็ว</title>
 
 <style>
@@ -190,7 +191,7 @@ body {
 
 /* ========= DISPLAY BOX ========= */
 .display-box {
-  margin: 6px auto 4px;
+  margin: 6px auto 2px;
   width: 90%;
   max-width: 480px;
   border-radius: 16px;
@@ -207,6 +208,16 @@ body {
   min-height: 120px;
   max-height: 140px;
   padding: 10px;
+}
+
+/* ========= TIMER ========= */
+#timerBox {
+  width: 90%;
+  max-width: 480px;
+  margin: 0 auto 4px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #4b5563;
 }
 
 /* ========= SETTINGS PANEL ========= */
@@ -251,6 +262,7 @@ body {
   align-items: center;
   gap: 6px;
   font-weight: 500;
+  margin-top: 4px;
 }
 
 .settings-panel .inline-label input {
@@ -398,6 +410,10 @@ body.dark-mode .display-box {
   color:#e5e7eb;
 }
 
+body.dark-mode #timerBox {
+  color:#9ca3af;
+}
+
 body.dark-mode .settings-panel,
 body.dark-mode .keypad-area {
   background:#020617;
@@ -445,6 +461,7 @@ body.dark-mode .action-buttons button {
     font-size: 3.5rem;
   }
 
+  #timerBox,
   .settings-panel,
   .keypad-area {
     max-width: 520px;
@@ -509,6 +526,288 @@ body.dark-mode .action-buttons button {
       พร้อมแข่งโหมด “ท้าทาย” กับเพื่อนๆ!
     </div>
   </div>
+  <div class="hero-mascot">
+    <div class="mascot-circle">
+      <div class="mascot-face">
+        <div class="mascot-eyes">
+          <span class="eye"></span>
+          <span class="eye"></span>
+        </div>
+        <div class="mascot-mouth"></div>
+      </div>
+      <div class="mascot-abacus">🧮</div>
+    </div>
+    <div class="mascot-speech" id="mascotSpeech">
+      มาลองเล่นกันดูไหม?
+    </div>
+  </div>
+</div>
+
+<!-- MENU BAR -->
+<div class="menu-bar">
+  <button id="btnSettings">ตั้งค่า</button>
+  <button id="btnStart">เริ่ม</button>
+  <button id="btnStop">หยุด</button>
+  <button id="btnReset">รีเซ็ต</button>
+  <button id="btnFullscreen">เต็มจอ</button>
+</div>
+
+<!-- DISPLAY BOX -->
+<div id="displayBox" class="display-box">พร้อม</div>
+<div id="timerBox">เวลา: 00:00.00</div>
+
+<!-- SETTINGS PANEL -->
+<div id="settingsPanel" class="settings-panel" style="display:none;">
+  <h3>การตั้งค่า</h3>
+
+  <label>โหมดการเล่น</label>
+  <select id="setMode">
+    <option value="practice">ฝึกฝน (แสดงเฉลยอัตโนมัติ)</option>
+    <option value="challenge">ท้าทาย (ตอบเองด้วยปุ่มตัวเลข)</option>
+  </select>
+
+  <label>ประเภทโจทย์</label>
+  <select id="setOpType">
+    <option value="plus">บวกอย่างเดียว</option>
+    <option value="plusMinus">บวก + ลบ</option>
+  </select>
+
+  <label>จำนวนหลักของตัวเลข</label>
+  <select id="setDigitMode">
+    <option value="1" selected>1 หลัก (0–9 หรือ 1–9)</option>
+    <option value="2">2 หลัก (10–99)</option>
+    <option value="3">3 หลัก (100–999)</option>
+    <option value="4">4 หลัก (1000–9999)</option>
+  </select>
+
+  <label class="inline-label">
+    <input type="checkbox" id="setNoZero" checked>
+    ไม่สุ่มเลข 0
+  </label>
+
+  <label class="inline-label">
+    <input type="checkbox" id="setPreventNegative" checked>
+    ไม่ให้ผลรวมระหว่างทางติดลบ
+  </label>
+
+  <label>จำนวนตัวเลขต่อ 1 ข้อ</label>
+  <input id="setCountPerQuestion" type="number" min="1" max="99" value="5">
+
+  <label>จำนวนข้อใน 1 รอบ</label>
+  <input id="setTotalQuestions" type="number" min="1" max="99" value="10">
+
+  <label>ความเร็วการแสดงตัวเลข (ms)</label>
+  <input id="setSpeed" type="number" min="100" max="5000" value="800">
+
+  <label>ขนาดตัวเลข</label>
+  <select id="setFontSize">
+    <option value="small">เล็ก</option>
+    <option value="medium" selected>กลาง</option>
+    <option value="large">ใหญ่</option>
+    <option value="xl">XL</option>
+    <option value="xxl">XXL</option>
+  </select>
+
+  <label>เสียงเอฟเฟกต์ (Beep)</label>
+  <select id="setSound">
+    <option value="on" selected>เปิดเสียง</option>
+    <option value="off">ปิดเสียง</option>
+  </select>
+
+  <label>ธีม / โหมดจอ</label>
+  <select id="setTheme">
+    <option value="light" selected>โทนสว่าง (ค่าเริ่มต้น)</option>
+    <option value="dark">โทนเข้ม (Dark Mode)</option>
+  </select>
+
+  <label>เสียงอ่าน (Text-to-Speech)</label>
+  <select id="setTTSLang">
+    <option value="th" selected>ไทย</option>
+    <option value="en">อังกฤษ</option>
+  </select>
+
+  <label>ตัวเลือกเสียงอ่าน</label>
+  <div class="inline-label">
+    <input type="checkbox" id="setReadQuestionNo" checked>
+    <span>อ่านลำดับข้อ (ข้อ 1, ข้อ 2,...)</span>
+  </div>
+  <div class="inline-label">
+    <input type="checkbox" id="setReadDigits" checked>
+    <span>อ่านตัวเลขโจทย์</span>
+  </div>
+  <div class="inline-label">
+    <input type="checkbox" id="setReadAnswer" checked>
+    <span>อ่านคำตอบ</span>
+  </div>
+
+  <hr>
+
+  <button id="adminToggleBtn"
+          style="background:#6b7280; color:white; border:none;
+                 padding:6px 12px; border-radius:8px;">
+    โหมดผู้ดูแล (Admin)
+  </button>
+
+  <div id="adminPanel" style="display:none; margin-top:10px; 
+                              background:#f3f4f6; padding:12px; border-radius:10px;">
+    <h4>จัดการบัญชีผู้ใช้</h4>
+
+    <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px;">
+      <input id="adminNewUser" type="text" placeholder="username"
+             style="flex:1; padding:4px;">
+      <input id="adminNewPass" type="text" placeholder="password"
+             style="flex:1; padding:4px;">
+      <input id="adminNewName" type="text" placeholder="ชื่อแสดง"
+             style="flex:1; padding:4px;">
+      <button id="adminAddUserBtn"
+              style="padding:4px 10px; background:#22c55e; color:white;
+                     border:none; border-radius:6px;">เพิ่ม</button>
+    </div>
+
+    <div style="margin-top:6px; font-weight:600;">รายชื่อผู้ใช้</div>
+    <div id="adminUserList"
+         style="max-height:150px; overflow:auto; background:white;
+                border:1px solid #ddd; padding:6px; border-radius:8px;">
+      (กำลังโหลด…)
+    </div>
+
+    <button id="adminResetAllBtn"
+            style="margin-top:10px; padding:4px 10px; background:#ef4444; color:white;
+                   border:none; border-radius:6px;">
+      รีเซ็ตสถิติทั้งหมด
+    </button>
+  </div>
+</div>
+
+<!-- CHALLENGE KEYPAD -->
+<div id="keypadArea" class="keypad-area" style="display:none;">
+  <input id="answerInput" type="text" readonly class="answer-input">
+
+  <div class="keypad">
+    <!-- ปุ่มตัวเลขจะถูกสร้างด้วย JS -->
+  </div>
+
+  <div class="action-buttons">
+    <button id="keyDelete" class="btn-delete">Delete</button>
+    <button id="keyClear"  class="btn-clear">Clear</button>
+    <button id="keyEnter"  class="btn-enter">Enter</button>
+  </div>
+</div>
+
+<script>
+/********************************************
+ *  JavaScript หลักของแอป
+ ********************************************/
+
+// คีย์สำหรับ localStorage
+const USERS_KEY          = "kruF_users_v1";
+const CURRENT_USER_KEY   = "kruF_current_user_v1";
+const SETTINGS_KEY       = "kruF_settings_v1";
+const ADMIN_PASSWORD     = "KF888";      // รหัส admin
+
+// ตัวแปรผู้ใช้ / admin
+let users = [];
+let currentUser = null;
+let isAdminMode = false;
+
+// ตัวแปรเกม / settings
+let mode = "practice";        // practice / challenge
+let opType = "plus";          // plus / plusMinus
+let digitMode = "1";          // "1".."4"
+let noZero = true;
+let preventNegative = true;
+let soundSetting = "on";      // on / off
+let themeSetting = "light";   // light / dark
+let soundEnabled = true;
+
+// TTS settings
+let ttsLang = "th";           // "th" หรือ "en"
+let readQuestionNo = true;
+let readDigits = true;
+let readAnswer = true;
+
+// สถานะเล่น
+let isRunning = false;
+let numbersPerQuestion = 5;
+let totalQuestions = 10;
+let speedMs = 800;
+let fontSizeSetting = "medium";
+
+let currentQuestionIndex = 0;
+let currentSequence = [];
+let currentAnswer = 0;
+let currentIndexInSeq = 0;
+
+let mainTimer = null;
+let blinkTimer = null;
+
+// timer UI + session timing
+let sessionStartTime = null;
+let timerInterval = null;
+
+// challenge mode
+let challengeCorrect = 0;
+let challengeMistakes = 0;
+let challengeTarget = 10;
+let challengeStartTime = null;
+
+// DOM refs
+const loginOverlay   = document.getElementById("loginOverlay");
+const loginUserInput = document.getElementById("loginUser");
+const loginPassInput = document.getElementById("loginPass");
+const loginBtn       = document.getElementById("loginBtn");
+const loginErrorBox  = document.getElementById("loginError");
+
+const currentUserBox = document.getElementById("currentUserBox");
+
+const btnSettings    = document.getElementById("btnSettings");
+const btnStart       = document.getElementById("btnStart");
+const btnStop        = document.getElementById("btnStop");
+const btnReset       = document.getElementById("btnReset");
+const btnFullscreen  = document.getElementById("btnFullscreen");
+
+const displayBox     = document.getElementById("displayBox");
+const timerBox       = document.getElementById("timerBox");
+const settingsPanel  = document.getElementById("settingsPanel");
+
+const setMode        = document.getElementById("setMode");
+const setOpType      = document.getElementById("setOpType");
+const setDigitMode   = document.getElementById("setDigitMode");
+const setNoZero      = document.getElementById("setNoZero");
+const setPreventNegative = document.getElementById("setPreventNegative");
+const setCountPerQuestion = document.getElementById("setCountPerQuestion");
+const setTotalQuestions   = document.getElementById("setTotalQuestions");
+const setSpeed            = document.getElementById("setSpeed");
+const setFontSize         = document.getElementById("setFontSize");
+const setSound            = document.getElementById("setSound");
+const setTheme            = document.getElementById("setTheme");
+const setTTSLang          = document.getElementById("setTTSLang");
+const setReadQuestionNo   = document.getElementById("setReadQuestionNo");
+const setReadDigits       = document.getElementById("setReadDigits");
+const setReadAnswer       = document.getElementById("setReadAnswer");
+
+const adminToggleBtn      = document.getElementById("adminToggleBtn");
+const adminPanel          = document.getElementById("adminPanel");
+const adminNewUser        = document.getElementById("adminNewUser");
+const adminNewPass        = document.getElementById("adminNewPass");
+const adminNewName        = document.getElementById("adminNewName");
+const adminAddUserBtn     = document.getElementById("adminAddUserBtn");
+const adminUserList       = document.getElementById("adminUserList");
+const adminResetAllBtn    = document.getElementById("adminResetAllBtn");
+
+const keypadArea          = document.getElementById("keypadArea");
+const answerInput         = document.getElementById("answerInput");
+const keypadDiv           = document.querySelector(".keypad");
+const keyEnter            = document.getElementById("keyEnter");
+const keyDelete           = document.getElementById("keyDelete");
+const keyClear            = document.getElementById("keyClear");
+
+const mascotSpeech        = document.getElementById("mascotSpeech");
+
+// Audio (Beep)
+let audioCtx = null;
+function initAudio() {
+  if (!audi>
   <div class="hero-mascot">
     <div class="mascot-circle">
       <div class="mascot-face">
